@@ -1,0 +1,94 @@
+/* 攻略図鑑（通常版 codex.html と 完全攻略版 guide.html で共通） */
+:root, :root[data-time="day"] {
+  --bg: #f4efe3; --bg2: #ebe3d1; --paper: #fbf8f1; --ink: #2a241c; --muted: #6e6455; --line: #d9ccb2;
+  --accent: #8a5a1c; --accent2: #2f6b4a; --gold: #b8872a; --chip: #efe5cf; --bad: #a3402e;
+  --shadow: 0 1px 0 rgba(60,40,10,.06), 0 12px 28px -18px rgba(60,40,10,.35);
+}
+:root[data-time="night"] {
+  --bg: #12141f; --bg2: #181b29; --paper: #1d2132; --ink: #ece6d6; --muted: #a49d8c; --line: #343a52;
+  --accent: #e3b864; --accent2: #8fc9a5; --gold: #e9c070; --chip: #272c41; --bad: #e08a74;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 16px 34px -20px rgba(0,0,0,.8);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-time="day"]) { color-scheme: dark; } }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 120px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Zen Kaku Gothic New", "Yu Gothic UI", "Meiryo", sans-serif; line-height: 1.8; font-size: 15.5px; overflow-x: hidden; }
+a { color: var(--accent); }
+h1, h2, h3 { font-family: "Shippori Mincho B1", "Yu Mincho", serif; font-weight: 800; line-height: 1.35; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+header .row { display: flex; align-items: center; gap: 12px; height: 56px; }
+.logo { font-family: "Cinzel", serif; font-weight: 700; letter-spacing: .12em; text-decoration: none; color: var(--ink); white-space: nowrap; }
+.logo small { font-family: "Shippori Mincho B1", serif; letter-spacing: .05em; color: var(--muted); margin-left: 8px; font-size: 13px; }
+.search { flex: 1; min-width: 0; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+.search input { width: min(340px, 100%); padding: 7px 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; }
+.toggle { border: 1px solid var(--line); background: var(--chip); color: var(--ink); border-radius: 99px; padding: 5px 12px; cursor: pointer; font: inherit; font-size: 13px; white-space: nowrap; }
+nav.cats { display: flex; gap: 4px; overflow-x: auto; padding: 6px 0 8px; scrollbar-width: none; }
+nav.cats::-webkit-scrollbar { display: none; }
+nav.cats a { padding: 5px 12px; border-radius: 99px; text-decoration: none; color: var(--muted); background: var(--chip); font-size: 14px; white-space: nowrap; }
+nav.cats a:hover { color: var(--ink); }
+.intro { padding: 28px 0 8px; }
+.intro h1 { font-size: clamp(28px, 4.6vw, 44px); margin: 0 0 8px; }
+.intro p { color: var(--muted); margin: 0 0 6px; max-width: 760px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; font-size: 13px; color: var(--muted); align-items: center; }
+section { padding: 34px 0 10px; border-top: 1px solid var(--line); margin-top: 26px; }
+section > h2 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 4px; }
+section > p.lead { color: var(--muted); margin: 0 0 16px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.filters button { border: 1px solid var(--line); background: var(--paper); color: var(--muted); border-radius: 99px; padding: 3px 12px; cursor: pointer; font: inherit; font-size: 13px; }
+.filters button.on { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); min-width: 0; }
+.card:target { outline: 3px solid var(--gold); }
+.card h3 { font-size: 18px; margin: 0 0 4px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.card h3 .sub { font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 500; font-size: 13px; color: var(--muted); }
+.card p { margin: 4px 0; overflow-wrap: anywhere; }
+.card .meta { font-size: 13.5px; color: var(--muted); }
+.card dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 6px 0 0; font-size: 14px; }
+.card dt { color: var(--muted); white-space: nowrap; }
+.card dd { margin: 0; overflow-wrap: anywhere; }
+.badge { display: inline-block; font-size: 11.5px; padding: 1px 8px; border-radius: 99px; font-weight: 700; letter-spacing: .03em; vertical-align: 2px; white-space: nowrap; }
+.badge.done { background: color-mix(in srgb, var(--accent2) 18%, transparent); color: var(--accent2); }
+.badge.wip { background: color-mix(in srgb, var(--gold) 22%, transparent); color: var(--gold); }
+.badge.idea { background: var(--chip); color: var(--muted); }
+.chip { display: inline-block; background: var(--chip); border-radius: 6px; padding: 0 7px; margin: 1px 2px 1px 0; font-size: 13px; text-decoration: none; color: var(--ink); }
+a.chip:hover { outline: 1px solid var(--accent); }
+.el { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; background: var(--c, #888); }
+.stars { color: var(--gold); letter-spacing: -1px; }
+.spoiler { filter: blur(5px); cursor: pointer; transition: filter .2s; user-select: none; }
+body.spoil .spoiler, .spoiler.open { filter: none; user-select: auto; }
+.bar { height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; margin: 2px 0 6px; }
+.bar i { display: block; height: 100%; background: var(--accent2); }
+table.mini { border-collapse: collapse; font-size: 13.5px; width: 100%; }
+table.mini td, table.mini th { border-bottom: 1px solid var(--line); padding: 3px 6px; text-align: left; }
+.hidden { display: none !important; }
+.count { font-size: 13px; color: var(--muted); }
+footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); margin-top: 40px; }
+@media (max-width: 640px) { header .row { height: auto; flex-wrap: wrap; padding: 8px 0; } .search { justify-content: stretch; } .search input { width: 100%; } }
+
+/* 目次・パンくず・絞り込み・版の切り替え・未検証 */
+.crumbs { font-size: 13px; color: var(--muted); padding: 6px 0 0; }
+.crumbs a { color: var(--muted); }
+.toc { display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0 4px; }
+.toc .count { margin-left: 2px; }
+.tagbars { margin: 10px 0 0; }
+.tagbars .filters { margin: 0 0 6px; align-items: center; }
+.ver { border: 1px solid var(--accent); color: var(--accent); background: var(--paper); border-radius: 99px; padding: 4px 12px; text-decoration: none; font-size: 13px; white-space: nowrap; }
+.badge.unv { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
+/* 完全攻略版: 入口の確認・地図・場所の一覧 */
+.gate { position: fixed; inset: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 96%, transparent); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.gate .box { max-width: 560px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; box-shadow: var(--shadow); }
+.gate h2 { margin: 0 0 8px; }
+.gate .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.gate button, .gate a { font: inherit; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--accent); cursor: pointer; text-decoration: none; }
+.gate button { background: var(--accent); color: var(--paper); }
+.gate a { background: var(--paper); color: var(--accent); }
+body.gated { overflow: hidden; }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+#mapView svg { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; }
+#mapKinds { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+#mapKinds label { cursor: pointer; }
+.tablebox { max-height: 640px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+#placeTable td:nth-child(4) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .mapwrap { grid-template-columns: 1fr; } .tablebox { max-height: 420px; } }#placeTable td:nth-child(2), #placeTable td:nth-child(3) { white-space: nowrap; }
+@media (max-width: 640px) { .search { flex-basis: 100%; flex-wrap: wrap; } .search input { flex-basis: 100%; } }

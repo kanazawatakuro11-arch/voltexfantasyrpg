@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja" data-time="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoltexFantasyRPG 攻略図鑑</title>
+<meta name="description" content="VoltexFantasyRPG の公式攻略図鑑。世界と都市、クエスト、キャラクター、魔物とボス、動物、アイテムとクラフト、七柱の神々と祠、遊びの仕組みを、ゲームの定義データから調べられます。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="codex.css">
+</head>
+<body data-mode="normal">
+<header>
+  <div class="wrap">
+    <div class="row">
+      <a class="logo" href="index.html">VOLTEXFANTASYRPG<small>攻略図鑑</small></a>
+      <div class="search">
+        <input id="q" type="search" placeholder="図鑑を検索（例: スライム・リンゴ・ミラ・祠）" aria-label="図鑑を検索">
+        <button class="toggle" id="spoilBtn" type="button" aria-pressed="false">ネタバレを表示</button>
+        <a class="ver" id="verBtn" href="guide.html">完全攻略版（ネタバレ）へ</a>
+        <button class="toggle" id="timeBtn" type="button">夜</button>
+      </div>
+    </div>
+    <nav class="cats" aria-label="分類">
+      <a href="#world">世界・都市</a><a href="#quests">クエスト</a><a href="#heroes">キャラクター</a><a href="#mobs">魔物・ボス</a><a href="#animals">動物・テイム</a>
+      <a href="#items">アイテム・クラフト</a><a href="#gear">装備・オーブ</a><a href="#artifacts">アーティファクト</a><a href="#gods">神々と祠</a><a href="#history">歴史ディメンション</a><a href="#systems">遊びの仕組み</a><a href="index.html">← トップへ</a>
+    </nav>
+    <div class="crumbs" id="crumbs"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>攻略図鑑</h1>
+    <p>ゲームの中にあるものを調べられる図鑑です。中身はゲームの定義データ（data/*.json）から自動で作っているので、ゲームと同じ内容になります。</p>
+    <p>クエストの手がかりやボスなど、遊ぶ前に知りたくない情報はぼかしてあります。右上の「ネタバレを表示」か、ぼかしをクリックすると読めます。</p>
+    <p>すべての位置・隠し要素・ボスの攻略・歴史ディメンションの勝ち方まで知りたいときは、<a href="guide.html">完全攻略版（ネタバレあり）</a>へ。</p>
+    <div class="legend"><span class="badge done">実装済み</span> ゲームで遊べる <span class="badge wip">開発中</span> 一部だけ遊べる <span class="badge idea">構想</span> 設計だけ（まだ遊べない） <span class="badge unv">未検証</span> 実機での確認がまだ <span class="count" id="gen"></span> <span class="count" id="hits"></span></div>
+    <nav class="toc" id="toc" aria-label="目次"></nav>
+    <div class="tagbars" id="tagFilters"></div>
+  </div>
+
+  <section id="world"><h2>世界と都市</h2><p class="lead">2048×2048 マスの一枚の大地に 8 つの大都市と、天界・冥界・地獄の都。都市の名前から、そこで頼みごとをくれる人へたどれます。</p>
+    <div class="grid" id="worldGrid"></div></section>
+
+  <section id="quests"><h2>クエスト図鑑</h2><p class="lead">「大事な頼み」は決まった人が決まった品を探しています（産地まで見分けます）。ほかに、住人が日ごとに出す頼みごと（手紙・荷物・お使い・採掘）があります。</p>
+    <div class="filters" id="questFilters"></div><div class="grid" id="questGrid"></div></section>
+
+  <section id="heroes"><h2>キャラクター図鑑</h2><p class="lead">操作できる仲間たち。属性（七柱の神々）と職業は別の物で、武器の種類による相性（じゃんけん）はありません。</p>
+    <div class="filters" id="heroFilters"></div><div class="grid" id="heroGrid"></div></section>
+
+  <section id="mobs"><h2>魔物・ボス図鑑</h2><p class="lead">出る場所・攻撃の仕方・落とす物。落とす物の名前を押すと、その品の説明へ飛びます。</p>
+    <div class="filters" id="mobFilters"></div><div class="grid" id="mobGrid"></div>
+    <h3 style="margin:26px 0 10px">ボス</h3><div class="grid" id="bossGrid"></div></section>
+
+  <section id="animals"><h2>動物・テイムできる生き物</h2><p class="lead">好物をあげると仲良くなり、村で暮らすと卵や羊毛をくれます。乗れる動物、飼育場へ送れる恐竜も。</p>
+    <div class="grid" id="animalGrid"></div></section>
+
+  <section id="items"><h2>アイテムとクラフト</h2><p class="lead">作り方（レシピ）・使い道・手に入る所。材料の名前を押すと、その材料へ飛びます。</p>
+    <div class="filters" id="itemFilters"></div><div class="grid" id="itemGrid"></div></section>
+
+  <section id="gear"><h2>仲間の装備: 固有武器・オーブ・衣装</h2><p class="lead">ガチャ（ゲーム内のコインだけ）で手に入る、仲間専用の装備です。</p>
+    <div class="grid" id="gearGrid"></div></section>
+
+  <section id="artifacts"><h2>アーティファクト</h2><p class="lead">始まりの村の展示台に飾ると効果があります（同じ物は 1 つ分）。手に入る場所はネタバレとしてぼかしています。</p>
+    <div class="grid" id="artifactGrid"></div></section>
+
+  <section id="gods"><h2>七柱の神々と街道の祠</h2><p class="lead">街道の 11 の祠に、七柱の神々のいずれかがまつられています。祈ると、操作中の仲間がその神の加護を得ます。</p>
+    <div class="grid" id="godGrid"></div></section>
+
+  <section id="history"><h2>歴史ディメンション</h2><p class="lead">始まりの村の外れの「時の割れ目」から入る、別の時代の小さなゲームです。中にいる間、外の世界の時間は止まり、負けても世界・持ち物・セーブは変わりません。報酬は段階ごとに 1 回だけ（受取箱へ）。</p>
+    <div class="grid" id="historyGrid"></div></section>
+
+  <section id="systems"><h2>遊びの仕組み</h2><p class="lead">操作と、遊びの仕組みの一覧です。</p>
+    <div class="grid" id="sysGrid"></div></section>
+</main>
+<footer><div class="wrap">VoltexFantasyRPG 攻略図鑑 — <a href="index.html">トップページ</a> ／ <a href="https://pakkun1113.itch.io/voltexrpg" target="_blank" rel="noopener">Download on itch.io</a><br>Music: MaouDamashii（音楽：魔王魂 <a href="https://maou.audio/" target="_blank" rel="noopener">maou.audio</a>）</div></footer>
+
+<script src="data/world.js"></script>
+<script src="data/codex.js"></script>
+<script src="codex-app.js"></script>
+</body>
+</html>

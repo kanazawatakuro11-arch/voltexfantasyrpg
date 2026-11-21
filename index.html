@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="ja" data-time="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoltexFantasyRPG — 暮らしと冒険のブロック世界</title>
+<meta name="description" content="ブロックでできた広い世界。8 つの都市に人が暮らし、街道には旅人と祠、森には動物。家を建て、村を育て、友だちと同じ世界を冒険するファンタジーRPG。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ---- 昼と夜の色（data-time で切り替え） ---- */
+  :root, :root[data-time="day"] {
+    --bg: #f4efe3; --bg2: #ebe3d1; --paper: #fbf8f1; --ink: #2a241c; --muted: #6e6455; --line: #d9ccb2;
+    --accent: #8a5a1c; --accent2: #2f6b4a; --gold: #b8872a; --sky1: #9cc6ea; --sky2: #f6e7c8;
+    --card-shadow: 0 1px 0 rgba(60,40,10,.06), 0 14px 34px -18px rgba(60,40,10,.35);
+    --chip: #efe5cf; --hero-shade: linear-gradient(180deg, rgba(20,14,6,0) 35%, rgba(20,14,6,.72));
+  }
+  :root[data-time="night"] {
+    --bg: #12141f; --bg2: #181b29; --paper: #1d2132; --ink: #ece6d6; --muted: #a49d8c; --line: #343a52;
+    --accent: #e3b864; --accent2: #8fc9a5; --gold: #e9c070; --sky1: #1b2340; --sky2: #2b2546;
+    --card-shadow: 0 1px 0 rgba(0,0,0,.4), 0 18px 40px -20px rgba(0,0,0,.8);
+    --chip: #272c41; --hero-shade: linear-gradient(180deg, rgba(6,8,18,.1) 30%, rgba(6,8,18,.85));
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Zen Kaku Gothic New", "Yu Gothic UI", "Meiryo", sans-serif;
+    line-height: 1.85; font-size: 16px; overflow-x: hidden; transition: background .6s, color .6s; }
+  img { max-width: 100%; display: block; }
+  a { color: var(--accent); }
+  h1, h2, h3 { font-family: "Shippori Mincho B1", "Yu Mincho", serif; font-weight: 800; letter-spacing: .02em; line-height: 1.35; }
+  .latin { font-family: "Cinzel", serif; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---- 上のメニュー ---- */
+  header.top { position: fixed; inset: 0 0 auto 0; z-index: 30; transition: background .3s, box-shadow .3s; }
+  header.top.solid { background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(8px); box-shadow: 0 1px 0 var(--line); }
+  header.top .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
+  .logo { font-family: "Cinzel", serif; font-weight: 700; font-size: 20px; letter-spacing: .12em; text-decoration: none; color: #fff; white-space: nowrap; }
+  header.top.solid .logo { color: var(--ink); }
+  nav.menu { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; margin-left: auto; min-width: 0; }
+  nav.menu::-webkit-scrollbar { display: none; }
+  nav.menu a { padding: 6px 10px; border-radius: 99px; text-decoration: none; color: rgba(255,255,255,.88); font-size: 14px; white-space: nowrap; }
+  header.top.solid nav.menu a { color: var(--muted); }
+  nav.menu a:hover { background: rgba(255,255,255,.18); }
+  header.top.solid nav.menu a:hover { background: var(--chip); color: var(--ink); }
+  .timebtn { flex: none; border: 1px solid rgba(255,255,255,.5); background: rgba(0,0,0,.18); color: #fff; border-radius: 99px; padding: 5px 12px; cursor: pointer; font: inherit; font-size: 13px; }
+  header.top.solid .timebtn { border-color: var(--line); background: var(--chip); color: var(--ink); }
+
+  /* ---- 大きな絵 ---- */
+  .hero { position: relative; min-height: min(92vh, 860px); display: grid; align-items: end; color: #fff; overflow: hidden; }
+  .hero .bg { position: absolute; inset: 0; background-size: cover; background-position: center; transform: scale(1.04); transition: opacity 1.2s; }
+  .hero .bg.day { background-image: url(images/village_day.jpg); }
+  .hero .bg.night { background-image: url(images/village_night.jpg); opacity: 0; }
+  :root[data-time="night"] .hero .bg.night { opacity: 1; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: var(--hero-shade); }
+  .hero .text { position: relative; z-index: 1; padding: 0 16px clamp(56px, 9vh, 96px); max-width: 1160px; margin: 0 auto; width: 100%; }
+  .hero .eyebrow { font-size: 13px; opacity: .85; margin-bottom: 14px; }
+  .hero h1 { font-size: clamp(34px, 6.4vw, 72px); margin: 0 0 16px; text-shadow: 0 4px 30px rgba(0,0,0,.4); }
+  .hero p { font-size: clamp(16px, 2vw, 19px); max-width: 640px; margin: 0 0 26px; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+  .btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 99px; text-decoration: none; font-weight: 700;
+    background: var(--gold); color: #1d1405; transition: transform .2s; }
+  .btn.itch { background: #fa5c5c; color: #fff; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.ghost { background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.45); backdrop-filter: blur(6px); }
+  .scrollhint { position: absolute; z-index: 1; left: 50%; bottom: 18px; transform: translateX(-50%); font-size: 12px; opacity: .7; animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translate(-50%, 6px); } }
+
+  /* ---- 節 ---- */
+  section { padding: 96px 0; position: relative; }
+  section.alt { background: var(--bg2); }
+  .head { display: grid; gap: 6px; margin-bottom: 36px; max-width: 760px; }
+  .head .latin { color: var(--accent); font-size: 13px; }
+  .head h2 { font-size: clamp(28px, 4vw, 42px); margin: 0; }
+  .head p { color: var(--muted); margin: 0; }
+  .badge { display: inline-block; font-size: 11.5px; padding: 1px 9px; border-radius: 99px; font-weight: 700; vertical-align: middle; letter-spacing: .04em; }
+  .badge.done { background: color-mix(in srgb, var(--accent2) 22%, transparent); color: var(--accent2); }
+  .badge.wip { background: color-mix(in srgb, var(--gold) 24%, transparent); color: var(--gold); }
+  .badge.plan { background: var(--chip); color: var(--muted); }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s, transform .8s; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---- 世界の紹介 ---- */
+  .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+  .pillar { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--card-shadow); }
+  .pillar .num { font-family: "Cinzel", serif; color: var(--gold); font-size: 28px; }
+  .pillar h3 { margin: 4px 0 6px; font-size: 20px; }
+  .pillar p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* ---- 地図 ---- */
+  .mapwrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+  @media (max-width: 880px) { .mapwrap { grid-template-columns: 1fr; } }
+  .map { position: relative; border-radius: 18px; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid var(--line); aspect-ratio: 1 / 1; background: #2a5c9a; }
+  .map img { width: 100%; height: 100%; object-fit: cover; transition: filter .8s; }
+  :root[data-time="night"] .map img { filter: brightness(.55) saturate(.8) hue-rotate(-12deg); }
+  .map svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .pin { position: absolute; transform: translate(-50%, -50%); border: none; cursor: pointer; padding: 0; background: none; }
+  .pin i { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--gold); border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,.45); transition: transform .2s; }
+  .pin span { position: absolute; left: 50%; top: 22px; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 700; color: #fff;
+    text-shadow: 0 1px 3px #000, 0 0 8px rgba(0,0,0,.6); pointer-events: none; }
+  .pin:hover i, .pin.on i { transform: scale(1.35); background: #fff; border-color: var(--gold); }
+  .pin.realm i { background: #9c7cf0; }
+  .stopdot { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); opacity: .85; box-shadow: 0 0 0 2px rgba(0,0,0,.35); }
+  .maplegend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .maplegend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  .citypanel { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: var(--card-shadow); }
+  .citypanel img { aspect-ratio: 16 / 7; object-fit: cover; width: 100%; background: var(--chip); }
+  .citypanel .body { padding: 20px 22px 24px; }
+  .citypanel .kicker { color: var(--accent); font-size: 13px; }
+  .citypanel h3 { margin: 2px 0 8px; font-size: 26px; }
+  .facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 14px; margin: 12px 0; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--chip); border-radius: 99px; padding: 2px 10px; font-size: 13px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tabs button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 99px; padding: 5px 14px; cursor: pointer; font: inherit; font-size: 14px; }
+  .tabs button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ---- 都市のカード ---- */
+  .cities { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+  .city { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); cursor: pointer; transition: transform .25s; text-align: left; padding: 0; font: inherit; color: inherit;
+    display: flex; flex-direction: column; justify-content: flex-start; }
+  .city:hover { transform: translateY(-4px); }
+  .city img { aspect-ratio: 16 / 9; object-fit: cover; width: 100%; }
+  .city .body { padding: 14px 16px 16px; }
+  .city h3 { margin: 0; font-size: 19px; }
+  .city p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+  /* ---- 暮らし（画像と文） ---- */
+  .feature { display: grid; grid-template-columns: 1.1fr 1fr; gap: 34px; align-items: center; margin-bottom: 64px; }
+  .feature.rev > :first-child { order: 2; }
+  @media (max-width: 820px) { .feature, .feature.rev { grid-template-columns: 1fr; } .feature.rev > :first-child { order: 0; } }
+  .shot { border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid var(--line); }
+  .shot img { width: 100%; }
+  .feature h3 { font-size: 26px; margin: 6px 0 10px; }
+  .feature ul { padding-left: 1.1em; margin: 8px 0 0; color: var(--muted); }
+  .feature li { margin: 4px 0; }
+  .feature li b { color: var(--ink); }
+
+  /* ---- 生き物図鑑 ---- */
+  .mobs { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .mob { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: var(--card-shadow); }
+  .mob h4 { margin: 0 0 4px; font-family: "Shippori Mincho B1", serif; font-size: 18px; }
+  .mob .cls { font-size: 12px; color: var(--muted); }
+  .mob p { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); }
+  .mob .sigil { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-family: "Shippori Mincho B1", serif; font-weight: 800; color: #fff; float: right; margin-left: 8px; }
+
+  /* ---- マルチプレイ ---- */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+.four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.four figure { margin: 0; }
+.four figcaption { text-align: center; color: var(--muted); font-size: 14px; margin-top: 6px; }
+@media (max-width: 820px) { .four { grid-template-columns: 1fr 1fr; } }
+.felltable { border-collapse: collapse; margin-top: 10px; font-size: 14.5px; width: 100%; }
+.felltable th, .felltable td { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: center; }
+.felltable th:first-child, .felltable td:first-child { text-align: left; }
+  .box { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--card-shadow); }
+  .box h3 { margin: 0 0 10px; font-size: 20px; }
+  .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .checks li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; font-size: 15px; }
+  .checks li::before { content: "✓"; color: var(--accent2); font-weight: 700; }
+  .checks.todo li::before { content: "…"; color: var(--muted); }
+  kbd { font-family: Consolas, monospace; background: var(--chip); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 6px; font-size: 13px; }
+
+  /* ---- 歩み ---- */
+  .timeline { position: relative; display: grid; gap: 14px; padding-left: 26px; }
+  .timeline::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--line); }
+  .ev { position: relative; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; font-size: 14.5px; }
+  .ev::before { content: ""; position: absolute; left: -25px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px var(--bg2); }
+  .ev time { color: var(--accent); font-size: 12.5px; font-weight: 700; margin-right: 8px; }
+  .ev code { font-size: 11px; color: var(--muted); }
+  .more { margin-top: 16px; }
+  .more button { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 99px; padding: 8px 18px; cursor: pointer; font: inherit; }
+
+  /* ---- ギャラリー ---- */
+  .gallery { columns: 3 280px; column-gap: 14px; }
+  .gallery figure { break-inside: avoid; margin: 0 0 14px; border-radius: 14px; overflow: hidden; position: relative; cursor: zoom-in; box-shadow: var(--card-shadow); }
+  .gallery figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 12px 8px; font-size: 13px; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.7)); }
+  .lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(8,8,12,.92); display: none; place-items: center; padding: 20px; cursor: zoom-out; }
+  .lightbox.on { display: grid; }
+  .lightbox img { max-height: 86vh; border-radius: 10px; }
+  .lightbox p { color: #ddd; text-align: center; margin: 10px 0 0; }
+
+  /* ---- 案内 ---- */
+  .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .tip { background: var(--paper); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 16px; box-shadow: var(--card-shadow); font-size: 15px; }
+  .tip b { display: block; font-family: "Shippori Mincho B1", serif; font-size: 17px; margin-bottom: 2px; }
+
+  /* ---- 仲間（キャラクター図鑑） ---- */
+  .heroes { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+  .herocard { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--card-shadow); display: grid; grid-template-columns: 74px 1fr; gap: 14px; align-items: start; position: relative; overflow: hidden; }
+  .herocard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--el); }
+  .herocard h4 { margin: 0; font-family: "Shippori Mincho B1", serif; font-size: 19px; }
+  .herocard .meta { font-size: 12.5px; color: var(--muted); }
+  .herocard .stars { color: var(--gold); letter-spacing: .05em; font-size: 13px; }
+  .herocard p { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); }
+  .herocard .bars { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; font-size: 11.5px; margin-top: 8px; color: var(--muted); }
+  .herocard .bars i { display: block; height: 6px; border-radius: 3px; background: var(--el); margin-top: 7px; opacity: .8; }
+  .portrait { width: 74px; height: 92px; position: relative; border-radius: 10px; background: color-mix(in srgb, var(--el) 16%, var(--chip)); }
+  .portrait b { position: absolute; display: block; }
+  .rates { display: grid; gap: 6px; }
+  .rate { display: grid; grid-template-columns: 210px 1fr 54px; gap: 10px; align-items: center; font-size: 14px; }
+  .rate .bar { height: 10px; border-radius: 5px; background: var(--chip); overflow: hidden; }
+  .rate .bar i { display: block; height: 100%; background: var(--gold); }
+  @media (max-width: 600px) { .rate { grid-template-columns: 130px 1fr 46px; font-size: 13px; } }
+  .minicards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .minicard { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 13.5px; border-top: 4px solid var(--el, var(--gold)); }
+  .minicard b { display: block; font-family: "Shippori Mincho B1", serif; font-size: 15.5px; }
+  .minicard span { color: var(--muted); font-size: 12.5px; }
+  /* ---- 七柱の神々 ---- */
+  .gods { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .god { border-radius: 18px; padding: 20px; color: #fff; position: relative; overflow: hidden; box-shadow: var(--card-shadow);
+    background: radial-gradient(circle at 80% 15%, color-mix(in srgb, var(--el) 85%, #fff) 0, var(--el) 30%, color-mix(in srgb, var(--el) 45%, #10131f) 100%); }
+  .god .lantern { position: absolute; right: 16px; top: 16px; width: 26px; height: 34px; border-radius: 8px; background: color-mix(in srgb, var(--el) 70%, #fff); box-shadow: 0 0 24px 6px color-mix(in srgb, var(--el) 70%, #fff); }
+  .god .el { font-family: "Shippori Mincho B1", serif; font-size: 34px; line-height: 1; text-shadow: 0 2px 12px rgba(0,0,0,.35); }
+  .god h4 { margin: 8px 0 4px; font-family: "Shippori Mincho B1", serif; font-size: 20px; text-shadow: 0 1px 6px rgba(0,0,0,.4); }
+  .god p { margin: 0; font-size: 13.5px; opacity: .95; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+  .god .n { font-size: 12px; opacity: .85; margin-top: 8px; }
+  .god.light { color: #2a241c; } .god.light h4, .god.light p, .god.light .el { text-shadow: none; }
+  table.skills { width: 100%; border-collapse: collapse; font-size: 14.5px; background: var(--paper); border-radius: 12px; overflow: hidden; }
+  table.skills td, table.skills th { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  table.skills th { background: var(--chip); font-weight: 700; }
+
+  footer { padding: 46px 0 70px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .scrollhint { animation: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#">VOLTEXFANTASYRPG</a>
+    <nav class="menu" aria-label="ページ内のメニュー">
+      <a href="#world">世界</a><a href="#nature">四季</a><a href="#map">地図</a><a href="#cities">都市</a><a href="#life">暮らし</a><a href="#outskirts">城外</a><a href="#roads">街道</a><a href="#build">建築</a>
+      <a href="#heroes">仲間</a><a href="#menu">メニュー</a><a href="#gods">神々</a><a href="#travel">割れ目</a><a href="#plays">旅の遊び</a><a href="#museum">博物館</a><a href="#economy">交易</a><a href="#sky">星座</a><a href="#historydim">歴史</a><a href="#mobs">生き物</a><a href="#multi">マルチ</a><a href="#gallery">写真</a><a href="#guide">案内</a><a href="https://pakkun1113.itch.io/voltexrpg" target="_blank" rel="noopener">ダウンロード</a><a href="codex.html">攻略図鑑</a><a href="guide.html">完全攻略版</a>
+      <a href="guide.html">遊び方ガイド</a>
+    </nav>
+    <button class="timebtn" id="timebtn" type="button" aria-label="昼と夜を切り替える">☀ 昼</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="bg day"></div><div class="bg night"></div>
+  <div class="text">
+    <div class="eyebrow latin">A living world of blocks</div>
+    <h1>人が暮らし、旅人が行き交う<br>ブロックの大地へ。</h1>
+    <p>8 つの都市にはそれぞれの文化と一日の暮らしがあり、街道には祠と旅人、森には動物たち。家を建て、村を育て、友だちと同じ世界を歩くファンタジーRPG。</p>
+    <div class="btns">
+      <a class="btn itch" href="https://pakkun1113.itch.io/voltexrpg" target="_blank" rel="noopener">Download on itch.io</a>
+      <a class="btn" href="#map">世界地図を見る</a><a class="btn" href="codex.html">攻略図鑑を開く</a>
+      <a class="btn ghost" href="guide.html">はじめての遊び方</a>
+    </div>
+  </div>
+  <div class="scrollhint">▼ スクロール</div>
+</div>
+
+<section id="world">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">The World</span><h2>そこにいるだけで楽しい世界</h2>
+      <p>2048×2048 マス・高さ 256 の一枚の大地。天界の浮島と地底の国まで、すべて歩いて行けます。</p></div>
+    <div class="pillars">
+      <div class="pillar reveal"><div class="num" id="n-cities">8</div><h3>大都市</h3><p>農業の都、鉱山都市、砂の王都、世界樹の都、城下町、水の都、森の砦、雪の聖都。さらに天界・冥界・地獄の都。</p></div>
+      <div class="pillar reveal"><div class="num" id="n-people">—</div><h3>暮らす人々</h3><p>一人ひとりに家と仕事と一日の予定。出勤の時刻も歩く速さも人それぞれ。夕方は家族が並んで帰ります。</p></div>
+      <div class="pillar reveal"><div class="num" id="n-stops">24</div><h3>街道の宿場</h3><p>16 本の街道に馬宿・宿・農村。旅人と行商人が行き交い、道ばたには静かな祠とベンチ。</p></div>
+      <div class="pillar reveal"><div class="num">∞</div><h3>自由な建築</h3><p>ブロックを掘って、置いて、家を建てる。半分の大きさの「小型ブロック」で窓枠や家具まで。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="nature">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Seasons &amp; Nature</span><h2>四季がめぐる大地</h2>
+      <p>ゲームの中の 7 日ごとに、春・夏・秋・冬。季節の変わり目は 2 日かけて、少しずつ色が移ります。写真はすべて同じ森を、同じ場所から撮ったものです。</p></div>
+    <div class="four reveal">
+      <figure><div class="shot"><img src="images/shots/nature_season_spring.jpg" alt="春の森。明るい新緑" loading="lazy"></div><figcaption>春 — 新緑</figcaption></figure>
+      <figure><div class="shot"><img src="images/shots/nature_season_summer.jpg" alt="夏の森。深い緑" loading="lazy"></div><figcaption>夏 — 深い緑</figcaption></figure>
+      <figure><div class="shot"><img src="images/shots/nature_season_autumn.jpg" alt="秋の森。木ごとに違う赤・橙・黄" loading="lazy"></div><figcaption>秋 — 赤・橙・黄と落ち葉</figcaption></figure>
+      <figure><div class="shot"><img src="images/shots/nature_season_winter.jpg" alt="冬の森。葉を落とした枝" loading="lazy"></div><figcaption>冬 — 葉を落とした枝</figcaption></figure>
+    </div>
+    <div class="two" style="margin-top:28px">
+      <div class="box reveal"><h3>四つの気候帯と雪 <span class="badge done">遊べます</span></h3>
+        <p>高温・温暖・冷涼・寒冷の気候帯が、土地の種類と高さから決まり、約 80 マスかけてなめらかにつながります。温暖な森の冬は落葉が中心で雪は少し、寒い地方ほど雪が積もり、雷雨は横なぐりの<b>吹雪</b>に。高温の地方は冬でも雨です。積もった雪は春に解けます。</p>
+        <p style="color:var(--muted);font-size:14px">天界・冥界・地獄は地上の四季とは関係ありません。季節の見た目は設定で切れます（季節の時間と天気はそのまま進みます）。</p></div>
+      <div class="box reveal"><h3>なめらかな斜面と、自然な形の木 <span class="badge done">遊べます</span></h3>
+        <p>草地や雪原の 1 段の段差は斜めの面でつながり、坂は跳ばずに歩いて登れます（崖・建物・道・階段は角ばったまま）。木は曲がった丸い幹・根・枝・葉のかたまりで描かれ、風で葉が揺れ、太陽の方を見ると葉が透けて明るく見えます。</p>
+        <p style="color:var(--muted);font-size:14px">地形のデータは変えていないので、今までのセーブもそのまま。設定で今までの段々・ブロックの木に戻せます。</p></div>
+    </div>
+    <div class="feature reveal" style="margin-top:40px">
+      <div class="shot"><img src="images/shots/nature_sunrise_peak.jpg" alt="雪山の山頂から見る朝日。長い影と朝焼け" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>雪山の朝日と展望地点</h3>
+        <ul><li>太陽の向きと高さに合わせた<b>本物の影</b>。朝日・夕日のときは長い影がのびます</li>
+          <li>日なたは朝の金色〜淡い桃色、日かげは青み。雪面が朝焼けに染まります</li>
+          <li>木々や岩のすき間から差す<b>光の筋</b>、谷にたまる朝霧、遠くの山ほど青白く霞む空気</li>
+          <li>雪の高い山頂 4 か所に<b>展望地点</b>（石の台・東を向いたベンチ・灯り）。朝 5〜7 時がいちばんきれいです</li>
+          <li>重いときは設定「太陽の影と光」で切れます</li></ul></div>
+    </div>
+    <div class="two reveal">
+      <div><div class="shot"><img src="images/shots/nature_lookout.jpg" alt="雪山の展望地点。東を向いたベンチと灯り" loading="lazy"></div>
+        <p style="color:var(--muted);font-size:14px;text-align:center">展望地点 — 東を向いたベンチで朝日を待つ</p></div>
+      <div class="box"><h3>苗木を植えて、森を育てる <span class="badge done">遊べます</span></h3>
+        <p style="color:var(--muted)">木を切ると原木と苗木が手に入ります。植えた苗木は 苗木 → 若木 → 成木 と育ち、同じ種類を 2×2 に植えると、1 本の太い幹の<b>巨木</b>になります。斧で切るたびに木が揺れ、決まった回数で根元から倒れます。</p>
+        <table class="felltable">
+          <tr><th>木</th><th>切る回数</th><th>原木</th><th>苗木</th></tr>
+          <tr><td>ふつうの成木</td><td>5</td><td>5</td><td>4</td></tr>
+          <tr><td>ふつうの巨木（2×2）</td><td>7</td><td>20</td><td>16</td></tr>
+          <tr><td>ジャングルの成木</td><td>5</td><td>20</td><td>16</td></tr>
+          <tr><td>ジャングルの巨木（2×2）</td><td>7</td><td>80</td><td>64</td></tr>
+        </table></div>
+    </div>
+  </div>
+</section>
+
+<section id="map" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Atlas</span><h2>世界地図</h2>
+      <p>ゲームの地図データから作った、実際の地上の地図です。都市の印を選ぶと、その都市の文化と見どころが出ます。</p></div>
+    <div class="tabs" id="layertabs" role="tablist">
+      <button class="on" data-layer="ground" type="button">地上の都市</button>
+      <button data-layer="realm" type="button">三界の都（天界・冥界・地獄）</button>
+    </div>
+    <div class="mapwrap">
+      <div>
+        <div class="map" id="map-canvas">
+          <img src="images/worldmap.jpg" alt="ゲームの地図データから描いた地上の地図（北が上）" loading="lazy">
+          <svg id="roads" viewBox="0 0 2048 2048" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="maplegend"><span><i style="background:var(--gold)"></i>都市</span><span><i style="background:#9c7cf0"></i>三界の都（地上の真上・真下）</span><span><i style="background:#fff;box-shadow:0 0 0 2px #555"></i>宿場</span><span>— 街道</span></div>
+      </div>
+      <article class="citypanel" id="citypanel" aria-live="polite"></article>
+    </div>
+  </div>
+</section>
+
+<section id="cities">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Cities</span><h2>都市めぐり</h2><p>写真はすべてゲームの中で撮った実際の画面です。選ぶと地図の上で場所がわかります。</p></div>
+    <div class="cities" id="citycards"></div>
+  </div>
+</section>
+
+<section id="life" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Daily Life</span><h2>暮らしのある世界</h2><p>プレイヤーが見ていなくても、人々は自分の一日を過ごしています。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/interior_nordic.jpg" alt="森の砦の家の中: 暖炉と薪、椅子、木箱、カーテン" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>家の中に、生活の跡</h3>
+        <p>都市と宿場の約 570 軒に家具と小物があります。住む人の仕事と土地で中身が変わります。</p>
+        <ul><li><b>雪国</b>は暖炉と薪、厚いカーテン</li><li><b>学者</b>の机には本と書類、<b>商人</b>の家には木箱と帳簿</li>
+          <li><b>水の都</b>には網と樽、<b>城下町</b>は畳とちゃぶ台と座布団</li><li>酒場の机には器、宿屋には旅の鞄</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/shrine.jpg" alt="街道の祠: 石の像、ベンチに座る巡礼者と祈る人" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>街道の祠と、巡礼者</h3>
+        <p>街道のまん中あたりに 11 の小さな祠。朝・昼・夕方のどこかで巡礼者が来て、ひとりは祈り、ひとりはベンチで休み、やがて宿へ帰っていきます。真夜中はだれもいない、静かな場所です。</p>
+        <ul><li>祠のまわりは魔物の出ない安全な場所</li><li>ベンチのわきに<b>落とし物の手紙</b>。読むと小さな物語、宛先の人に届けるとお礼がもらえます</li></ul></div>
+    </div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/street_venice.jpg" alt="水の都の通り" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>一人ひとりの一日</h3>
+        <ul><li>出勤・帰宅の時刻、歩く速さ、ぶらぶら歩きの向きは人ごとに違います</li>
+          <li>同じ家の<b>家族や友だち</b>は夕方を一緒に過ごし、並んで帰ります。遅れたら振り返って待つことも</li>
+          <li>すれちがった知り合いは立ち止まって<b>ひと言あいさつ</b></li>
+          <li>店の人は営業時間に店に立ち、衛兵は交代で見張り、夜はベッドで眠ります</li>
+          <li>酒場や店に人が詰めかけないよう、混んでいたら広場で過ごします</li>
+          <li><b>7 日に 1 日はお休み</b>。散歩好き・信心深い人・食べ歩き・買い物好き——休みの日の過ごし方は人それぞれ。話しかけると休みの話をしてくれます</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/tavern_night.jpg" alt="酒場: 椅子に腰かけた客と、立って歌う客" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>酒場のひととき</h3>
+        <p>食べに来た客は空いている椅子に腰かけ、立っている客のひとりが土地の歌を歌い出します。座った客はときどき杯を掲げて「乾杯！」。</p>
+        <ul><li>歌は都市ごとに違います（雪の聖都の鐘の歌、城下町の灯籠の歌、水の都の舟歌……）</li>
+          <li>客が少ない時間や、みんな座っている夜は静か</li>
+          <li>家の中も暮らし向きで違います: 広い家・商人の家には壁の絵と花、狭い家は質素。信心深い人の家には小さな祈りの台</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="outskirts">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Beyond the Walls</span><h2>城壁の外にも、暮らし</h2><p>都市は城壁の中だけで終わりません。門を出ると、その都市を支える仕事場があります。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/suburb_farm.jpg" alt="ミノリアの郊外の麦畑で働く農夫" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>郊外の仕事場</h3>
+        <p>7 つの都市の門の外に、その土地らしい仕事場。昼になると、その職業の住人の何人かが城壁の外へ通って働きます。</p>
+        <ul><li><b>ミノリア</b>の麦畑とかかし、<b>アカネ</b>の田んぼ</li><li><b>グラナート</b>の石切り場、<b>ネフェルカ</b>の砂岩の石切り場</li>
+          <li><b>ノルドハイム</b>の伐採場、<b>ヴェルナ</b>の漁具の干し場、<b>シュネーブルク</b>の雪国の馬屋</li>
+          <li>仕事場ごとに<b>荷運び</b>がひとり。荷車に麦わら・石材・丸太・魚の樽を積んで、1 日に 3 往復で町の倉庫へ運びます</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/stadium_finale.jpg" alt="大闘技場の決着: 紙吹雪が舞い、勝った側の観客が立ち上がって歓声をあげる" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>シュネーブルクの大闘技場</h3>
+        <p>大聖堂の都の城壁の外に建つ、ゴシックの石造りの競技場。掘り下げた競技場を 3 段の観客席が囲み、受付・売店・選手控室・訓練場があります。</p>
+        <ul><li>2 夜に 1 度は<b>大会の夜</b>（夜 8 時から）。都の人が観客席を埋め、<b>赤（東）と青（西）</b>に分かれて応援します</li>
+          <li>1 撃ごとに相棒が跳びかかり、頭の上の<b>体力のゲージ</b>が減ります。技が決まると歓声、決着で<b>紙吹雪</b>と勝った側の総立ち</li>
+          <li>試合は<b>スポーツ</b>。負けても相棒は失われず、試合のあとは元気に戻ります</li></ul></div>
+    </div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/stadium_partner.jpg" alt="自分の競技の相棒（赤）が大会に出ている。観客の応援の吹き出し" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>自分の相棒で出場する</h3>
+        <p>受付のエーデルトラウトと話すと、<b>競技の相棒</b>を 1 体迎えられます（5 種族から選ぶ。得意技と強みが違います）。</p>
+        <ul><li><b>練習試合</b>はいつでも、<b>大会</b>は大会の夜に。勝つと大きく、負けても少し育ちます</li>
+          <li>大会で勝つと<b>勝利の証</b>と賞金。証 2 枚で次の相棒を迎えられ、<b>歴代の勝者</b>に名前が残ります</li>
+          <li>LAN では<b>友だちの相棒と対戦</b>。ホストが組んだ同じ試合を全員が見ます（友だちとの対戦では証・賞金は出ません）</li>
+          <li>競技の相棒は、冒険の仲間（テイム）や精霊とは別の仲間です</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="roads" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Roads</span><h2>街道を行き交う人々</h2>
+      <p>都市と都市を結ぶ街道には、それぞれの目的で旅をする人がいます。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/road_messenger.jpg" alt="馬に乗り、都市の色の小旗を掲げて街道を駆ける伝令騎士" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>旅人・冒険者・伝令騎士</h3>
+        <ul><li>道の長さに合わせた人数（主要な街道は、見渡すと 2〜4 人ほど。寒い山道は少なめ）。商人・巡礼者・冒険者・<b>2 人連れ</b>（並んで歩きます）</li>
+          <li>歩く速さ・休む所・出発の時刻は一人ひとり違い、一斉に行進しません。昼に歩き、夜は道ばたで休みます</li>
+          <li>すれちがう旅人どうしがあいさつを交わします。目の前で急に現れたり消えたりしません</li>
+          <li><b>伝令騎士</b>: 8 つの都市にひとりずつ。都市ごとに違う色のマントと小旗で馬を駆り、となりの都市 → 自分の都市の城門 → 反対どなりの都市へ書状を届けます。旅人を追い越し、町の中では速さを落とします</li>
+          <li>騎士の前に立つと「道を開けよ！ 伝令である！」。遠くから近づくと「蹄の音が近づいてくる」と画面に知らせが出ます（世界の効果音はまだないので、画面の知らせで）。話しかけると都市の噂や情勢を教えてくれます</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="build">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Build</span><h2>建てる・育てる</h2></div>
+    <div class="two">
+      <div class="box reveal"><h3>小型ブロック <span class="badge done">遊べます</span></h3>
+        <p><kbd>B</kbd> キーで半分の大きさのブロックを置くモード。1 個のブロックが 8 つの小ブロックになります（削りくずは無駄になりません）。半段の段差は歩いて上がれます。窓枠、手すり、椅子、机……細かな建築に。</p>
+        <p><kbd>G</kbd> キーで<b>型紙</b>を替えると、下の半分・上の半分・階段（椅子にも）・机・薄い壁・細い柱を 1 回で置けます。向きは見ている方向に合わせて回ります。</p>
+        <p style="color:var(--muted);font-size:14px">地面や水には使わず、建物と家具・木のためのしくみです。セーブも別ファイルで、古いセーブはそのまま遊べます。</p></div>
+      <div class="box reveal"><h3>村を育てる <span class="badge done">遊べます</span></h3>
+        <p>始まりの村にベッドのある家を建てると、移住者がやって来ます。金床とかまどで鍛冶屋、展示台と箱で商店——建てた建物に合う職人が働き始めます。新しい家ができると、村の人が 2〜3 人、昼のうちに見物に来て感想を言っていきます。</p></div>
+    </div>
+    <div class="box reveal" style="margin-top:22px"><h3>小さな村から「伝説の都」へ <span class="badge done">遊べます</span></h3>
+      <p>冒険の発見と実績で、始まりの村は 8 つの段階を上がっていきます。段階ごとに建物が建ち、その寝床に合わせて新しい住人が移り住みます（役目・住まい・仕事場・一日の予定つき）。</p>
+      <ul style="color:var(--muted);margin:6px 0 0;padding-left:1.1em">
+        <li>Lv2 商店・宿屋・工房 ／ Lv3 市場・学校・広場・長屋 ／ Lv4 村をぐるりと囲む城壁と塔・兵舎・騎士団の館</li>
+        <li>Lv5 大聖堂・劇場 ／ Lv6 宮殿・大図書館・行政庁舎 ／ Lv7 巨大城郭・中央市場・8 都市の大使館 ／ Lv8 駅馬車の大駅・学術院・交易所・世界の広場</li>
+        <li>伝説の都のあとも「繁栄」が上がり、町が広がって建物が増えます。方針（軍事・商業・文化）と、人口・治安・商いなど 8 つの様子も見られます</li></ul>
+      <p style="color:var(--muted);font-size:14px">今までのセーブでは、読み込んだときに今の段階までの足りない建物を建てます（今ある建物・住人はそのまま）。</p></div>
+    <div class="feature reveal" style="margin-top:40px">
+      <div class="shot"><img src="images/shots/build_fence_pen.jpg" alt="柵で囲んだ牧場と、羊・牛。手前に柵の門" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>柵と牧場</h3>
+        <ul><li>柵は柱と横木の形で、となりの柵・門・ブロックと自動でつながります</li>
+          <li>高さ 1.5 マスの当たり判定。人も動物も飛び越えられず、囲いの中の動物は外へ出られません</li>
+          <li><b>柵の門</b>: 右クリックで開け閉め。住人は近づくと自分で開けて通ります（動物は開けません）</li>
+          <li><b>続けて置く</b>: 柵を持って右ボタンを押したまま動かすと、まっすぐな列を緑の枠で予告し「柵 N 本（持っている M 本）」と出ます。離すと置きます</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/build_beds.jpg" alt="板の床に並んだ 2 マスのベッドと灯り" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>2 マスのベッドと、眠る時間</h3>
+        <ul><li>頭と足の 2 マスのベッド。4 方向に置けて、持っているときに <kbd>R</kbd> で向きを回します。片方を壊すと両方なくなります</li>
+          <li>ベッドを右クリックすると<b>眠る画面</b>: 朝まで・1／3／6 時間・夢の記録・住まいの判定</li>
+          <li>眠るとベッドに横になり（頭は枕の側。住人も同じ）、画面がゆっくり暗くなって夢を見ます。HP と MP が戻り、ベッドが復活地点になります</li>
+          <li>住まいの数え方は今までどおり「ベッド 1 台 = 1 人」。今までの 1 マスのベッドもそのまま使えます</li></ul></div>
+    </div>
+    <div class="two reveal">
+      <div class="shot"><img src="images/shots/sleep_menu.jpg" alt="眠る画面: 朝まで・1/3/6 時間・夢の記録・住まいの判定" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/dream_garden.jpg" alt="夢の庭: 夜空に浮かぶ小さな庭と灯り" loading="lazy"></div>
+    </div>
+    <div class="box reveal" style="margin-top:22px"><h3>夢 <span class="badge done">遊べます</span></h3>
+      <p>眠ると夢を見ます。ふだんの夢のほか、<b>予知夢</b>はまだ見つけていない次元の割れ目の方角と距離、展望地点、数日後の祭り、都市の噂など、ゲームの中に本当にある場所や出来事を教えてくれます。ある条件をそろえたときだけ見る特別な夢も。見た夢は記録に残り、眠る画面で読み返せます。</p>
+      <p>ときどき、空に浮かぶ<b>夢の庭</b>を短い間だけ歩けます。光を 3 つ集めるか、時間がたつか、<kbd>E</kbd> で目が覚め、ベッドに戻ります。</p></div>
+  </div>
+</section>
+
+<section id="heroes">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Companions</span><h2>仲間と冒険する</h2>
+      <p>キャラクターを集め、育て、最大 5 人のパーティで旅をします。写真はすべてゲームの中の実際の画面、キャラクターの紹介はゲームのデータ（data/heroes.json）から作っています。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/hero_party_faces.jpg" alt="同行する仲間（アニメ調のモデル）の顔: 大きな目と髪型" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>1〜5 人の自由なパーティ</h3>
+        <ul><li>はじめの仲間は 3 人: <b>剣士アルト（炎）</b>・<b>魔法使いミラ（水）</b>・<b>騎乗盗賊カイ（風）</b></li>
+          <li><kbd>R</kbd> で操作するキャラクターを切り替え。姿・武器・能力・<b>持ち物</b>がその人のものに入れ替わります</li>
+          <li>操作していない仲間は後ろを歩き、剣・斧・盾は近づいて、弓・魔法は離れて戦い、錬金術師は傷を癒やします</li>
+          <li>1 人旅もできます。編成にいない仲間は待機か派遣</li>
+          <li><b>属性の共鳴</b>: 3 つ以上の属性をそろえると「七彩の共鳴」、同じ属性を 3 人そろえるとその属性の力がパーティ全員に</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/hero_equipment.jpg" alt="仲間の画面（P キー）: オーブの一覧と育成・合体のボタン" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>一人ひとりの持ち物と育ち</h3>
+        <ul><li>持ち物・防具・アクセサリーは<b>キャラクターごと</b>。仲間どうしで受け渡しでき、村のチェストにもしまえます</li>
+          <li>能力は 14 種（HP・MP・物理/魔法攻撃・防御・剣・斧・弓・錬金・器用・騎乗・採掘・農業・探索）。成長率は人それぞれ</li>
+          <li>器用な仲間は<b>錠前を外し</b>、罠を見破り、探索の得意な仲間は<b>宝の気配</b>に気づきます</li>
+          <li>同じ仲間が重なったら「強化に使う」か「別の個体として迎える」かを選べます（確認つき）</li></ul></div>
+    </div>
+    <h3 class="reveal" style="font-size:24px;margin:10px 0 14px">キャラクター図鑑</h3>
+    <div class="heroes" id="herolist"></div>
+
+    <div class="feature reveal" style="margin-top:56px">
+      <div class="shot"><img src="images/shots/hero_gacha.jpg" alt="めぐり逢いの泉（ガチャ）の演出: ★4 の光" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>めぐり逢いの泉（ガチャ）</h3>
+        <p>冒険や依頼で集めた<b>ゲーム内のコインだけ</b>で回せます（お金で買うしくみはありません）。報酬は受取箱に入り、持ち物がいっぱいでも消えません。</p>
+        <p id="gachaprice" style="color:var(--muted)"></p>
+        <div class="rates" id="gacharates"></div></div>
+    </div>
+    <div class="two reveal">
+      <div class="box"><h3>季節の祭りの衣装と、特別なスキン</h3><div class="minicards" id="costumelist"></div>
+        <p style="color:var(--muted);font-size:13.5px;margin:10px 0 0">季節限定の衣装は、そのときの季節のものが出ます。衣装は見た目だけでなく能力も少し変わります（なくても冒険は進められます）。</p></div>
+      <div class="box"><h3>固有武器 <span class="badge done">遊べます</span></h3><div class="minicards" id="weaponlist"></div>
+        <p style="color:var(--muted);font-size:13.5px;margin:10px 0 0">攻撃力・能力の上乗せ・属性に加えて、10 本すべての「効果」がゲームで働きます（焔剣・雷牙・水鏡・霜月・疾風・翠樹・二つの大盾・風断ち・雷影）。</p></div>
+    </div>
+    <div class="feature reveal" style="margin-top:56px">
+      <div class="shot"><img src="images/shots/hero_orb_fusion.jpg" alt="オーブの合体の確認: 合体前と合体後の数値" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>オーブ — 七属性の力を宿す宝珠</h3>
+        <ul><li>1 人に 3 つまで。オーブの欠片で育ち、<b>同じ種類どうしで合体</b>すると段階が上がって上限が広がります</li>
+          <li>合体の前に、前と後の数値を見せて確認します。装備中のオーブを勝手に使うことはありません</li>
+          <li>キャラクターと同じ属性のオーブは 1.25 倍。派遣の効率にも効きます</li></ul>
+        <div class="minicards" id="orblist" style="margin-top:12px"></div></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/hero_dispatch.jpg" alt="石切り場に派遣した仲間が、実際にそこで働いている" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>産業への派遣</h3>
+        <p>パーティにいない仲間を、郊外の畑・石切り場・伐採場や、村の錬金工房・鍛冶工房・交易所・探索隊へ。派遣した仲間は<b>本当にその仕事場で働いています</b>。</p>
+        <ul><li>成果は得意の能力（採掘・農業・錬金…）で変わり、12 時間分までたまります。受け取りは 1 回だけ</li>
+          <li>派遣中の仲間はパーティに入れません。呼び戻せばまた一緒に冒険できます</li>
+          <li>派遣先の仲間から、ときどき<b>便り</b>が届きます（「石切り場は朝が早いけれど、夕焼けがきれいです。」）</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/ui_character.jpg" alt="Blender で作った 3D の仲間（セラ）を、キャラクターの画面で見る" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>Blender で作った 3D の仲間と町の人</h3>
+        <ul><li>仲間 12 人全員を、Blender で作った 3D モデル（一体の体・服・髪・顔の表情・武器）に。歩く・走る・攻撃・滑空・騎乗・座る・横になる などの動きも Blender で作り、ゲームの中で混ぜて再生します</li>
+          <li>町の人は役割ごとの型（村人・商人・衛兵・城主・文官・巡礼者・旅人の 7 種 × 体型 2）を Blender で作り、一人ひとりは服や髪の色・髪型・背の高さ・小物で違いを出しています</li>
+          <li>セル調の陰影と輪郭線。メインメニューやキャラクターの画面で、回して・近づけて見られます</li>
+          <li>設定「主人公のモデル」「町の人のモデル」で今までのモデルに戻せます。デザインはすべてオリジナルです</li></ul></div>
+    </div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/hero_party5.jpg" alt="5 人のパーティ（アニメ調のモデル）を後ろから" loading="lazy"></div>
+      <div><span class="badge wip">開発中</span><h3>アニメ調の魔物と動物</h3>
+        <p>はじめに作ったアニメ調のモデル（下の写真）は、輪郭線とくっきりした 2 段の陰影（セル調）、大きな目、6 種類の髪型、衣装の部品、武器が見た目に出るしくみです。仲間と町の人は上の Blender のモデルに置きかわり、このしくみは魔物と動物と、設定で戻したときに使います。</p>
+        <ul><li><b>人ごとに違う体と顔</b>: 背の高さ・肩幅、目の形（丸い・明るい・やわらかい・鋭い）</li>
+          <li><b>ひじとひざ</b>が曲がる歩き・走り・攻撃、待機中の呼吸と見回し、まばたき</li>
+          <li><b>表情</b>: ほほえむ・楽しそう・真剣（攻撃中）・驚き。滑空中は楽しそうな顔に</li>
+          <li>布・革（帯とブーツ）・金属（刃の照り）の質感の違い</li></ul>
+        <p style="color:var(--muted);font-size:14px">段階的に導入しています。仲間と町の人はセル調と輪郭線、魔物と動物も設定でセル調と輪郭線に（遠くは簡略化）。MOB の専用モデルは「ひつじ」の試作から始め、いまは雲ひつじ・スライム・オオカミ・にわとりも専用のアニメ調です（ほかは開発中）。一時停止画面・E メニューの設定「生き物の見た目」で従来のモデルに戻せます。外部の素材は使っていません。ひつじ 40 匹と仲間 4 人で 60 FPS を確認。</p></div>
+    </div>
+    <div class="two reveal" style="margin-top:24px">
+      <div class="shot"><img src="images/shots/anime_lineup.jpg" alt="背の高さ・体格・目の形がちがう 4 人の仲間" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/anime_motion.jpg" alt="歩く・走る・攻撃の姿勢（ひじとひざが曲がる）" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/anime_face.jpg" alt="ほほえむミラの顔" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/anime_sheep.jpg" alt="アニメ調のひつじ（MOB の試作）" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Menu</span><h2>E キーのメインメニュー</h2>
+      <p><kbd>E</kbd> で開くメインメニュー。中央に操作中のキャラクターの 3D の姿、左に機能の一覧、右に選んだ機能の内容。どの画面も <kbd>Esc</kbd>（左上の「戻る」）でメニューへ戻り、<kbd>E</kbd> でいつでも閉じます。今までの持ち物とマス目のクラフトは <kbd>Tab</kbd> ですぐ開きます。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/ui_hub.jpg" alt="メインメニュー: 中央に主人公の 3D の姿、左に機能、右に詳しい内容" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>中央に 3D の主人公</h3>
+        <ul><li>ドラッグで回し、ホイールで顔まで近づけます。しばらく触らないとゆっくり回ります。装備した武器もそのまま見えます</li>
+          <li>左の機能: キャラクター・仲間／持ち物／装備・スキル／クラフト／クエスト／ワールドマップ／図鑑・冒険記録／召喚／加護・属性／交易／設定・セーブ</li>
+          <li>↑↓ と Enter、数字キー、クリックで開けます。深い紺・古金・羊皮紙の配色で、文字は読みやすく</li>
+          <li>メニューの控えめな効果音（設定で切れます）</li></ul></div>
+    </div>
+    <div class="two reveal">
+      <div class="shot"><img src="images/shots/ui_character.jpg" alt="キャラクターの画面: 一覧・3D の姿・能力" loading="lazy"></div>
+      <div class="box"><h3>キャラクター <span class="badge done">遊べます</span></h3>
+        <p>所有する全員の一覧（パーティ・待機・派遣中で絞り込み）、選んだ人の 3D の姿、そして 能力・装備・技・育成・記録 のタブ。「操作する」「パーティへ」「装備を替える」もここから。</p></div>
+    </div>
+    <div class="feature reveal" style="margin-top:40px">
+      <div class="shot"><img src="images/shots/ui_items.jpg" alt="持ち物の画面: 分類・並べ替え・検索と、選んだ品の説明" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>持ち物</h3>
+        <ul><li>武器・道具／防具／素材／消耗品／貴重品／クエスト関連／建築 に分類。レア度・種類・入手順・名前・数で並べ替え、名前で検索</li>
+          <li>選んだ品は大きな絵（ブロックは立方体の見本）と、性能・使い道・手に入る所を表示</li>
+          <li><b>保護（お気に入り）</b>した品は、自動のクラフト・整理・捨てる・売るに使われません。<kbd>Q</kbd> で捨てようとしても止まり、装備や貴重品は 2 回押したときだけ捨てます</li>
+          <li>Ctrl+クリックで複数選び、まとめて保護・近くのチェストへ移す・捨てる（確認の窓つき）。近くのチェストを「倉庫」として中身を見て、所持品へ出せます</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/ui_craft.jpg" alt="クイッククラフト: 作れる物が先頭のレシピの一覧と、材料・1/10/最大" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>クイッククラフト</h3>
+        <ul><li>作れる物が一覧の先頭に。「1 回」「10 回」「最大」で、材料は所持品から自動で使います</li>
+          <li>足りない板や棒も、材料があれば先に作ります（原木 → 板 → 棒 → 石のツルハシ を 1 回で）。全部作れるときだけ所持品を変え、材料を二重に使ったり増えたりしません</li>
+          <li>分類・検索・お気に入り（★）。作っても画面は閉じず、選んだレシピもそのまま</li>
+          <li>作業台・金床を右クリックすると、メニューを通らずここが開きます。「マス目で作る」で今までの 3×3 にも</li>
+          <li>足りない物は赤く、何がいくつ足りないかを表示します</li></ul></div>
+    </div>
+    <div class="two reveal">
+      <div class="shot"><img src="images/shots/ui_gacha_circle.jpg" alt="召喚の魔法陣" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/ui_gacha_results.jpg" alt="10 回召喚の結果の札" loading="lazy"></div>
+    </div>
+    <div class="two" style="margin-top:22px">
+      <div class="box reveal"><h3>召喚の画面 <span class="badge done">遊べます</span></h3>
+        <p>今までの「めぐり逢いの泉」の値段・確率・天井はそのままに、画面と演出を新しくしました。魔法陣が回り、いちばん良い結果の色（★5 金・★4 紫・★3 青）の光が立ち、札が 1 枚ずつ返ります。<kbd>Space</kbd> やクリックでとばせます。提供割合・天井まであと何回・所持コイン・召喚の履歴も同じ画面に。</p></div>
+      <div class="box reveal"><h3>世界地図 <span class="badge done">遊べます</span></h3>
+        <p>ホイールで拡大・縮小、ドラッグで移動。見つけた都市・村・祠・次元の割れ目・展望地点・名所・ワープの石が印で並び、選ぶと説明と距離が出ます。「目的地にする」と、画面の上に方角と距離、ミニマップに金のひし形。凡例を押すと種類ごとに表示を切り替えられます。</p></div>
+    </div>
+    <div class="shot reveal" style="margin-top:22px"><img src="images/shots/ui_map.jpg" alt="世界地図: 始まりの村のまわりの村・祠・街道" loading="lazy"></div>
+    <p class="reveal" style="margin-top:18px">ゲームの外で調べたいときは <a href="codex.html">攻略図鑑のページ</a> へ。クエスト・魔物・アイテム・神々などを、ゲームの定義データから一覧にしています。</p>
+  </div>
+</section>
+
+<section id="gods" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Seven Elements</span><h2>七属性と七柱の神々</h2>
+      <p>街道の 11 の祠には、七柱の神々のいずれかがまつられています。提灯は神の色。夜には同じ色の光が舞います。</p></div>
+    <div class="gods" id="godlist"></div>
+    <div class="feature reveal" style="margin-top:44px">
+      <div class="shot"><img src="images/shots/shrine_lantern_ice.jpg" alt="霜晶神セルフィナの祠: 氷の色の提灯と、まわりを舞う光（夜）" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>祠の加護</h3>
+        <ul><li>祠の石像を右クリックして祈ると、操作中のキャラクターがその神の<b>加護</b>を得ます（キャラクターごと・失いません）</li>
+          <li>有効にできる加護は 1 つ。キャラクター自身の属性と同じなら効果が大きくなります</li>
+          <li>1 人の仲間が七柱すべての加護を集めると、称号「七柱の巡礼者」と限定の衣装「七彩の巡礼衣」</li>
+          <li><b>祠の神託</b>: 毎日、七柱のうち一柱が「今日の神」。その属性の仲間は経験 1.5 倍（左上に表示）</li>
+          <li>祠の上には神の名前と属性が出ます</li></ul></div>
+    </div>
+    <h3 class="reveal" style="font-size:22px;margin:0 0 12px">属性の技（<kbd>X</kbd>）— 世界が変わる</h3>
+    <table class="skills reveal"><tr><th>属性</th><th>技でできること</th><th>魔物との相性</th></tr>
+      <tr><td>炎</td><td>前の雪や氷を溶かす</td><td>雪山・氷の魔物に強い</td></tr>
+      <tr><td>水</td><td>溶岩を冷やして黒曜石に</td><td>炎の魔物・火山に強い</td></tr>
+      <tr><td>氷</td><td>水を凍らせて、渡れる道にする</td><td>砂漠・高熱の魔物に強い</td></tr>
+      <tr><td>雷</td><td>まわりの魔物をしびれさせる</td><td>水の魔物に強い</td></tr>
+      <tr><td>緑</td><td>まわりの作物を早く育て、傷を癒やす</td><td>植物・回復</td></tr>
+      <tr><td>土</td><td>前の自然の岩を砕き、掘った物を手に入れる</td><td>岩・守り</td></tr>
+      <tr><td>風</td><td>風に乗って大きく跳ぶ</td><td>移動</td></tr></table>
+    <p class="reveal" style="color:var(--muted);font-size:14px;margin-top:10px">剣・魔法・弓・盾・斧・騎乗盗賊の「じゃんけん」のような相性はありません。役割（守る・遠くを撃つ・切る・壊す・開ける）で違いが出ます。町や村の中の建物は技で壊れません。</p>
+    <div class="shot reveal" style="max-width:640px;margin-top:20px"><img src="images/shots/element_ice_path.jpg" alt="氷の技で水を凍らせた道" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="travel">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Dimension Rifts</span><h2>次元の割れ目 — 三つの世界へ</h2>
+      <p>始まりの村の外れで、空間が縦に裂けています。触れると、天界・冥界・地獄の都のそばへパーティごと移動します。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/rift_village.jpg" alt="始まりの村の外れに並ぶ水色・紫・赤の次元の割れ目" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>水色・紫・赤の裂け目</h3>
+        <ul><li><b>水色の割れ目</b> → 天界（天空の聖都アウレリアのワープの石のそば）</li>
+          <li><b>紫の割れ目</b> → 冥界（冥府の都ネクロポリスのそば）</li>
+          <li><b>赤の割れ目</b> → 地獄（炎の民の都ヴォルカニアのそば。地下深くまで掘らなくても行けます）</li>
+          <li>着いた所のそばに<b>帰還の割れ目</b>があり、触れると<b>地上で割れ目に入った位置</b>へ戻ります（保存して、遊び直しても覚えています）</li>
+          <li>操作しているキャラクターだけでなく、同行の仲間が触れても移動します。ただし仲間がたまたま触れただけでは動きません（操作している人が割れ目へ向かっているときだけ）</li>
+          <li>移動の直後は、いったん割れ目から離れるまで反応しないので、行ったり来たりをくり返しません</li>
+          <li>今までの行き方（エンド要塞の門・地下を掘って地獄へ）もそのまま使えます。割れ目はブロックではないので、ワールドは変わりません</li></ul></div>
+    </div>
+    <div class="two reveal" style="margin-top:24px">
+      <div class="shot"><img src="images/shots/rift_heaven.jpg" alt="水色の割れ目の近く。内側に天界の空の色が見える" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/rift_night.jpg" alt="夜の次元の割れ目" loading="lazy"></div>
+    </div>
+    <div class="feature rev reveal" style="margin-top:40px">
+      <div class="shot"><img src="images/shots/rift_beam.jpg" alt="夕暮れの草原の向こうに立つ、次元の割れ目の光の柱" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>世界じゅうの割れ目</h3>
+        <ul><li>村のそばの割れ目に加えて、天界への割れ目が約 30、地獄への割れ目が約 30、冥界への割れ目が 5 つ、世界じゅうにあります（森や草原・岩山や荒野・雪原や沼の辺境）</li>
+          <li>遠くからは空へのびる<b>光の柱</b>が目印。近づくと地図に印が付き、もう一度探しに来られます</li>
+          <li>町・道・水の上・崖は避け、歩いて立てる所にだけ現れます。位置はセーブごとに覚えていて、今までのセーブにもブロックを変えずに加わります</li></ul></div>
+    </div>
+    <div class="feature reveal" style="margin-top:56px">
+      <div class="shot"><img src="images/shots/glide_party.jpg" alt="天界の浮島から、翼布を開いて滑空するパーティ" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>滑空 — 風切りの翼布</h3>
+        <ul><li>空中で<b>落ちているとき</b>に <kbd>Space</kbd> で翼布が開きます。もう一度 <kbd>Space</kbd> か <kbd>Shift</kbd> でたたみます</li>
+          <li>開くと落ちる速さがゆっくりになり（1 秒に約 2.4 マス）、<kbd>W</kbd> で前へ滑空、<kbd>Ctrl</kbd> で速く。向きは視点で変えます</li>
+          <li>着地や水に入ると自動でたたみます。急に止まらないよう、開いた直後は少しずつ減速します</li>
+          <li>天界の浮島から地上まで降りられます（自動テストでは 73 マス降りるあいだに 229 マス進みました）</li>
+          <li>同行の仲間も一緒に開いてついてきます。最初からパーティ全員が持っています</li>
+          <li>「天の翼」（羽ばたいて上へ）を付けているときは、羽ばたきを使い切ってから翼布が開きます</li>
+          <li>布は生成りと、持ち主の属性の色の縞。たたんだときは背中の小さな巻き布になります</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="museum">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Museum</span><h2>冒険の博物館</h2>
+      <p>始まりの村の空き地に、村の大工が博物館を建てます。冒険で集めたものが、実際に展示されていきます。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/museum_inside.jpg" alt="博物館の中: ボスや三界の模型が並ぶ台座" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>集めると、展示が増える</h3>
+        <ul><li><b>アーティファクト展示室</b>: 奥と左右の壁ぞいに展示台 21 台。今までと同じ展示台なので、飾ると効果もあります</li>
+          <li><b>ボスの模型</b>（5）・<b>三界の模型</b>（天界・冥界・地獄）・<b>歴史ディメンションの模型</b>（万里の長城・ピラミッド）</li>
+          <li><b>七柱の神々の宝珠</b>（加護を得ると灯る）・<b>固有武器</b>（持つと壁に飾られる）・<b>魔物の模型の棚</b>（見た魔物が順に並ぶ）</li>
+          <li>まだ手に入れていないものは灰色の<b>影の形</b>。見て右クリックすると、入手場所・歴史・効果の説明が読めます</li>
+          <li>中央奥の書見台では<b>冒険の記録</b>（倒した魔物・ボス・頼みごと・ワープ・祠・称号…）</li></ul></div>
+    </div>
+    <div class="two reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/museum_info.jpg" alt="守護像の模型の説明" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/museum_outside.jpg" alt="博物館の入口" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section id="economy" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Trade</span><h2>都市ごとに変わる経済</h2>
+      <p>8 つの大都市は、それぞれ得意な品と足りない品がちがいます。安い都市で仕入れて、高い都市で売りましょう。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/economy_trade.jpg" alt="E のメニュー「交易」: 都市ごとの値段" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>仕入れて、運んで、売る</h3>
+        <ul><li>鉱山都市は鉄が安く、世界樹の都では鉄が高い。水の都は魚、砂の王都は香辛料、城下町は茶、森の砦は干し肉…（都市の産業に合わせた値段）</li>
+          <li>たくさん買うとその都市で品薄になって値が上がり、売るとあまって下がります（最大 ±30%）。値段は毎日少しずつ元に戻ります</li>
+          <li>同じ店で買って売っても、コインは増えません（買い取りはいつも売り値より安い）</li>
+          <li>交易所に派遣した仲間の器用で、買い取りが少し高くなります（最大 +12%）</li>
+          <li><kbd>E</kbd> のメニュー「交易」で、8 都市の値段（↑品薄・↓あまり）と、最近の交易の記録が見られます</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="sky">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Stargazing</span><h2>星座と天体観測</h2>
+      <p>村に建つ星見の天文台。望遠鏡をのぞくと、七柱の神々の星座が夜空をゆっくり回っています。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/sky_constellation.jpg" alt="望遠鏡で見た炉火座と、その伝承" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>七柱の星座をさがす</h3>
+        <ul><li>天文台の<b>望遠鏡</b>を右クリック。WASD・矢印・ドラッグで空を見回します</li>
+          <li>星は時間とともに西へ回ります。星座を真ん中の輪に入れて少し見つめると<b>発見</b>。伝承が読め、E のメニューの図鑑「星座」に記録されます</li>
+          <li>星座を見つけると、その神の<b>祠が地図に印</b>されます（祠の試練への手がかり）</li>
+          <li>昼は「<b>夜まで待つ</b>」で 21 時に。長く待つ必要はありません</li>
+          <li>ときどき訪れる特別な夜には、空に不思議な並びが…（くわしくは<a href="codex.html#place-observatory">攻略図鑑</a>）</li></ul></div>
+    </div>
+    <div class="two reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/sky_telescope.jpg" alt="天文台の中の望遠鏡" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/sky_alignment.jpg" alt="南の低い空に並ぶ七色の星" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section id="historydim" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">History Dimensions</span><h2>歴史ディメンション</h2>
+      <p>始まりの村の外れに、金色に光る「時の割れ目」。触れると、別の時代の小さなゲームへ入れます。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/history_gate.jpg" alt="時の割れ目: 時代・段階・いっしょに行く仲間を選ぶ画面" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>時代と仲間を選んで、割れ目の向こうへ</h3>
+        <ul><li>時代ごとに遊びのジャンルも見た目もちがいます。仲間はその時代の装い（兜・頭巾など）になりますが、髪・顔・服の色・属性の色で誰か分かります</li>
+          <li>中にいる間、<b>外の世界の時間は止まります</b>。位置・パーティ・装備・持ち物はそのまま</li>
+          <li>いつでも<b>帰りの割れ目</b>（<kbd>Esc</kbd>）で元の場所へ。負けても世界とセーブは何も変わりません</li>
+          <li>はじめてクリアすると、限定衣装・限定アーティファクト・称号・博物館の展示などの報酬（段階ごとに 1 回だけ）</li>
+          <li>仲間の属性で少しだけ得意が変わります（くわしくは<a href="codex.html#history">攻略図鑑</a>）</li></ul></div>
+    </div>
+    <div class="feature reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/greatwall_run.jpg" alt="万里の長城: 長城の上を進む軍団と、青い門・赤い門" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>万里の長城 — 兵士増殖アクション</h3>
+        <ul><li>軍団は自動で前へ。<kbd>A</kbd>/<kbd>D</kbd>（←/→）で左右に動かし、<b>青い門</b>（+10・+64・×2・×3 …）で兵を増やし、<b>赤い門</b>（÷2・−5 …）を避けます</li>
+          <li>落石は隊の幅ごとよけ、敵の隊は数で押し切り、最後の砦を落とせばクリア</li>
+          <li>歩兵・盾兵・弓兵・騎兵にはそれぞれ得意があります（じゃんけんのような相性はありません）</li>
+          <li>八達嶺の関・居庸関の谷・山海関の海辺の 3 段階。兵が何百人に増えても、画面に描くのは代表の兵だけなので軽く動きます</li>
+          <li>道のりや報酬は創作です。史実の参考と簡略化は攻略図鑑に載せています</li></ul></div>
+    </div>
+    <div class="two reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/greatwall_shanhai.jpg" alt="山海関の海辺: 騎兵と歩兵の軍団" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/greatwall_clear.jpg" alt="砦を落としてクリア" loading="lazy"></div>
+    </div>
+    <div class="feature reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/egypt_working.jpg" alt="古代エジプト: ナイル川のほとりのパン屋と、建設中のピラミッド" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>古代エジプト — パン屋経営とピラミッド建設</h3>
+        <ul><li>ナイル川のほとりで、麦を刈り → 石臼で粉に → こね台で生地に → かまどで焼いて → 店で売る。どれもクリックひとつ、数秒で終わります</li>
+          <li>焼いたパンを<b>建設の人たちへ届ける</b>と、そのぶんピラミッドが一段ずつ高くなります</li>
+          <li>もうけで畑・石臼・かまど・店を広げ、畑の人・粉ひきの人・パン焼きの人・売り子・運び手を雇うと自動で働きます</li>
+          <li>3 段階: パン屋の開店 → ピラミッドを半分まで → 冠石まで積んで完成（お祝いの演出）。いつ帰っても、店は続きから</li>
+          <li>建設の人たちが食べ物を受け取って働いていたことなど、史実の参考と簡略化は攻略図鑑に</li></ul></div>
+    </div>
+    <div class="two reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/egypt_baking.jpg" alt="開店の日: 麦畑と石臼とかまど" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/egypt_complete.jpg" alt="ピラミッドの完成と祝い" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section id="plays">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">New Plays</span><h2>仲間と旅する、小さな遊び</h2>
+      <p>キャラクターと七属性のアップデートから生まれた新しい遊びです。30 案のうち 24 案がゲームで遊べます。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/idea_trial.jpg" alt="祠のそばの封じられた結晶と、封印の説明" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>祠の小さな試練と、神々の伝承</h3>
+        <ul><li>11 の祠のそばに、封じられた結晶が浮かんでいます（氷に閉ざされた・消えない炎に包まれた・岩に埋もれた…）</li>
+          <li>まつる神と<b>同じ属性の仲間</b>を操作して <kbd>X</kbd> の技を使うと封印が解け、その神の<b>伝承の欠片</b>が読めます（オーブの欠片も）</li>
+          <li>違う属性では解けません。どの属性が要るかは結晶の上に出るので、<kbd>R</kbd> で仲間を切り替えて挑みます</li>
+          <li>水底の神殿には<b>炎と氷の二つの技</b>を 10 秒のうちに当てないと開かない封印も</li></ul></div>
+    </div>
+    <div class="two reveal" style="margin-top:20px">
+      <div class="shot"><img src="images/shots/idea_lore.jpg" alt="水鏡神ミレシアの伝承「空を映す鏡」" loading="lazy"></div>
+      <div class="shot"><img src="images/shots/idea_banter.jpg" alt="カイとミラの掛け合いの吹き出し" loading="lazy"></div>
+    </div>
+    <div class="feature reveal" style="margin-top:44px">
+      <div class="shot"><img src="images/shots/idea_campfire.jpg" alt="たき火を囲んで座る仲間たちと掛け合い" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>旅のひととき</h3>
+        <ul><li><b>掛け合い</b>: 決まった 2 人がパーティにいると、歩きながら吹き出しで話します（14 組）</li>
+          <li><b>野営のたき火</b>: 「野営の道具」（原木 2・石炭 1）でたき火を起こすと、仲間が囲んで座り、HP と MP がゆっくり戻ります</li>
+          <li><b>表情</b>: Lv が上がると喜び、攻撃を受けると痛がり、割れ目の先では驚きます</li>
+          <li><b>ふるさと</b>: 仲間のふるさとの都市へその人で行くと、町の人が名前を呼び、店が 1 割引き</li>
+          <li><b>誕生日</b>: 誕生日に食べ物を渡すと喜んで経験が増えます（E のメニューに誕生日）</li></ul></div>
+    </div>
+    <div class="cards3 reveal" style="margin-top:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:12px">
+      <div class="box"><h3>宝の地図の断片</h3><p>探索の得意な仲間で、はじめての宝箱を調べると断片が見つかることも。4 枚で遺跡・洞窟・森のどこかに印。</p></div>
+      <div class="box"><h3>オーブの錬成石</h3><p>金床で水晶のかけらと金から作り、使うとオーブの欠片 +5。精霊が育つと、同じ属性のオーブも育ちます。</p></div>
+      <div class="box"><h3>魔獣との連携</h3><p>騎乗盗賊がテイムした恐竜に乗ると、<kbd>X</kbd> は魔獣の特技（ラプトルの大跳び・トリケラトプスの突進・ステゴサウルスのしっぽ）。</p></div>
+      <div class="box"><h3>属性で人助け</h3><p>雪道で動けない旅人を炎の技で助ける（3 日に 1 回）。ミノリアの風車を風の技で回す（1 日 1 回）。水の仲間は釣りの当たりが早い。</p></div>
+      <div class="box"><h3>暮らしとのつながり</h3><p>畑へ派遣した仲間のまかない（半日の強化）、派遣先の名産品、星灯り祭りに季節の衣装で行くと贈り物、重複強化で縁取りが金色に。</p></div>
+      <div class="box"><h3>図鑑の完成</h3><p>E のメニューの図鑑で分類を全部そろえると、称号とコイン 300。<span style="color:var(--muted)">まだの案: 隠し宝物庫・写真モード・LAN の連携と助っ人・模範試合・仲間の家（構想）</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section id="mobs">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Bestiary</span><h2>生き物図鑑</h2>
+      <p>ゲームのデータ（data/mobs.json・animals.json）から作っています。<span class="badge done">ゲームにいる</span> と <span class="badge plan">設計中</span> を分けて表示します。すべて本作オリジナルの生き物です。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/spirit_companion.jpg" alt="夜の祠で契りを結んだ精霊が、肩のあたりに小さな光となって漂う" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>夜の祠の精霊</h3>
+        <p>街道の祠で<b>夜に</b>祈ると、その祠に宿る精霊が姿を見せます。契りを結ぶと、小さな光になって肩のあたりを漂い、ささやかな助けをくれます。</p>
+        <ul><li>風・光・炎・水の 4 つの精霊（祠ごとに違う）</li><li>まだ一緒に祈っていない祠で夜に祈ると、精霊が育ちます——街道の旅の理由に</li>
+          <li>精霊は戦わせる仲間ではありません（冒険の魔獣・競技の相棒とは別）</li></ul></div>
+    </div>
+    <div class="feature rev reveal">
+      <div class="shot"><img src="images/shots/aquatic.jpg" alt="海の中を泳ぐイルカ" loading="lazy"></div>
+      <div><span class="badge done">遊べます</span><h3>水の生き物</h3>
+        <p>川や池にはサケやマスの小さな群れ、海や湖にはイルカ・カメ・熱帯魚。近づくとすっと逃げ、イルカはときどき水面から跳ねます。</p></div>
+    </div>
+    <div class="tabs" id="mobtabs"></div>
+    <div class="mobs" id="moblist"></div>
+  </div>
+</section>
+
+<section id="multi">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Together</span><h2>友だちと同じ世界で</h2><p>同じネットワーク（LAN）の 2〜4 人で遊べます。インターネットには公開しません。</p></div>
+    <div class="feature reveal">
+      <div class="shot"><img src="images/shots/lan.jpg" alt="LAN で参加したプレイヤーの姿と名札（自動テストの画面）" loading="lazy"></div>
+      <div class="two" style="grid-template-columns:1fr">
+        <div class="box"><h3>いまできること <span class="badge done">試作</span></h3>
+          <ul class="checks"><li>ホストは一時停止画面の「LAN に公開する」</li><li>参加する人はタイトル画面の「LAN のワールドに参加」（自動で見つかります）</li>
+            <li>おたがいの姿と名札、ブロックと小型ブロックの共同建築</li><li>時刻と天気はホストに合わせる</li><li>切れても自動でつなぎ直し、前の位置から</li><li>所持品・装備・レベルは自分のもの</li>
+            <li>村の<b>共同の依頼</b>: リナの日替わりの頼みに、みんなで少しずつ納めて達成。多く出した分は手元に戻り、お礼は 1 人 1 回</li>
+            <li>大闘技場で<b>競技の相棒どうしの対戦</b>（ホストが試合を組み、全員が同じ試合を見る）</li>
+            <li>キャラクター・持ち物・オーブはプレイヤーごと（それぞれのセーブに保存。ほかの人のものとは混ざりません）</li>
+            <li><kbd>H</kbd> キーで<b>ひとこと</b>（「こっちだよ！」「ありがとう！」など決まった言葉が頭の上に）</li></ul></div>
+        <div class="box"><h3>これから</h3>
+          <ul class="checks todo"><li>同行の仲間・派遣の姿をほかのプレイヤーにも見せる</li><li>村の発展・ふだんの頼みごとの共有</li><li>住人・動物・魔物の同期</li><li>2 台のパソコンでの確認（いまは 1 台のパソコンで、ゲームを 2 つ起動して確かめています）</li></ul></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="gallery">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">Gallery</span><h2>写真館</h2><p>すべてゲームの中の実際の画面（自動テストで撮影）。選ぶと大きく見られます。</p></div>
+    <div class="gallery" id="gallerylist"></div>
+  </div>
+</section>
+
+<section id="guide" class="alt">
+  <div class="wrap">
+    <div class="head reveal"><span class="latin">For Adventurers</span><h2>冒険者のための世界案内</h2></div>
+    <div class="guide">
+      <div class="tip reveal"><b>まずは街道を歩こう</b>始まりの村から 8 本の街道が都市へ。宿場で休み、祠で手紙を探しながら。</div>
+      <div class="tip reveal"><b>夜の雪の聖都</b>シュネーブルクの人々は夜に暮らします。暖炉の酒場が夜通し灯っています。</div>
+      <div class="tip reveal"><b>野の動物</b>ウサギやシカは近づくと逃げます。好物をあげると仲良くなって、ついてきます。</div>
+      <div class="tip reveal"><b>落とし物の手紙</b>祠のベンチのわきを右クリック。宛先は記録帳（<kbd>J</kbd>）に。</div>
+      <div class="tip reveal"><b>小型ブロック</b><kbd>B</kbd> で切り替え。半分の大きさで、椅子や窓枠を作れます。<kbd>G</kbd> の型紙なら階段や机も 1 回で。</div>
+      <div class="tip reveal"><b>友だちと</b>一時停止画面の「LAN に公開する」で、同じネットワークの友だちが参加できます。</div>
+      <div class="tip reveal"><b>競技の相棒</b>シュネーブルクの大闘技場の受付で、最初の 1 体を迎えよう。練習試合はいつでも。</div>
+      <div class="tip reveal"><b>仲間の画面</b><kbd>P</kbd> で仲間・編成・装備・オーブ・ガチャ・受取箱・派遣・図鑑。<kbd>R</kbd> で操作を切り替え。</div>
+      <div class="tip reveal"><b>属性の技</b><kbd>X</kbd>（MP 8）。氷の仲間なら水の上に道を、炎の仲間なら雪を溶かして進めます。</div>
+      <div class="tip reveal"><b>祠の加護</b>祠の石像に祈ると、その神の加護。夜にもう一度祈ると精霊にも会えます。</div>
+      <div class="tip reveal"><b>E のメニュー</b>持ち物の画面の上のタブで、キャラクター・加護・クエスト・図鑑・設定へ。</div>
+      <div class="tip reveal"><b>次元の割れ目</b>始まりの村の外れの裂け目に触れると、水色 → 天界・紫 → 冥界・赤 → 地獄。帰りは帰還の割れ目から。</div>
+      <div class="tip reveal"><b>滑空</b>落ちている途中で <kbd>Space</kbd>。<kbd>W</kbd> で前へ、<kbd>Ctrl</kbd> で速く、<kbd>Space</kbd>/<kbd>Shift</kbd> でたたむ。</div>
+      <div class="tip reveal"><b>酒場の歌</b>昼どきや夕方の酒場・茶屋をのぞくと、土地の歌が聞けるかも。</div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">VoltexFantasyRPG（開発中の試作版）。このページの写真はすべてゲーム内の実際の画面、地図はゲームの地図データから描いたものです。実装していない機能は「設計中」「これから」と書いています。
+  ／ <a href="guide.html">はじめての遊び方ガイド</a> ／ <a href="https://pakkun1113.itch.io/voltexrpg" target="_blank" rel="noopener">Download on itch.io</a><br>Music: MaouDamashii（音楽：魔王魂 <a href="https://maou.audio/" target="_blank" rel="noopener">maou.audio</a>）</div></footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true"><div><img id="lbimg" alt=""><p id="lbcap"></p></div></div>
+
+<script src="data/world.js"></script>
+<script>
+(() => {
+  const W = window.WORLD || { cities: [], stops: [], roads: [], mobs: [], history: [], worldSize: 2048 };
+  const S = W.worldSize || 2048;
+  const realms = new Set(["city_heaven", "village_nether", "city_hell"]);
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ---- 昼と夜（今の時刻で自動。ボタンで切り替え） ----
+  const root = document.documentElement, tb = $("#timebtn");
+  let t = new URLSearchParams(location.search).get("time");
+  try { t = t || localStorage.getItem("vrpg-time"); } catch (e) {}
+  if (!t) { const h = new Date().getHours(); t = h >= 18 || h < 6 ? "night" : "day"; }
+  const setTime = v => { root.dataset.time = v; tb.textContent = v === "night" ? "☾ 夜" : "☀ 昼"; try { localStorage.setItem("vrpg-time", v); } catch (e) {} };
+  setTime(t);
+  tb.addEventListener("click", () => setTime(root.dataset.time === "night" ? "day" : "night"));
+  const header = $("#top");
+  const onScroll = () => header.classList.toggle("solid", scrollY > 40);
+  addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+  // ---- 数 ----
+  const pop = W.cities.reduce((a, c) => a + (c.population || 0), 0);
+  $("#n-people").textContent = pop ? pop.toLocaleString() + "+" : "—";
+  $("#n-cities").textContent = W.cities.filter(c => !realms.has(c.id)).length || 8;
+  $("#n-stops").textContent = W.stops.length || 24;
+
+  // ---- 地図 ----
+  const canvas = $("#map-canvas"), svg = $("#roads");
+  svg.innerHTML = W.roads.map(r => `<polyline points="${r.map(p => p.join(",")).join(" ")}" fill="none" stroke="rgba(255,240,200,.55)" stroke-width="5" stroke-linejoin="round"/>`).join("");
+  for (const s of W.stops) {
+    const d = document.createElement("i"); d.className = "stopdot"; d.title = s.name;
+    d.style.left = (s.x / S * 100) + "%"; d.style.top = (s.z / S * 100) + "%"; canvas.appendChild(d);
+  }
+  const pins = {};
+  for (const c of W.cities) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "pin" + (realms.has(c.id) ? " realm" : "");
+    b.style.left = (c.x / S * 100) + "%"; b.style.top = (c.z / S * 100) + "%";
+    b.innerHTML = `<i></i><span>${esc((c.title && c.name.startsWith(c.title) ? c.name.slice(c.title.length) : c.name) || c.name)}</span>`;
+    b.setAttribute("aria-label", c.name);
+    b.addEventListener("click", () => show(c.id));
+    canvas.appendChild(b); pins[c.id] = b;
+  }
+  let layer = "ground";
+  const applyLayer = () => {
+    for (const c of W.cities) pins[c.id].style.display = (layer === "realm") === realms.has(c.id) ? "" : "none";
+    document.querySelectorAll("#layertabs button").forEach(x => x.classList.toggle("on", x.dataset.layer === layer));
+  };
+  document.querySelectorAll("#layertabs button").forEach(x => x.addEventListener("click", () => { layer = x.dataset.layer; applyLayer(); show(W.cities.find(c => (layer === "realm") === realms.has(c.id))?.id); }));
+  function show(id) {
+    const c = W.cities.find(x => x.id === id); if (!c) return;
+    Object.values(pins).forEach(p => p.classList.remove("on")); pins[id]?.classList.add("on");
+    const fac = (c.facilities || []).map(f => `<span class="chip">${esc(f)}</span>`).join("");
+    $("#citypanel").innerHTML = `<img src="images/shots/${esc(c.id)}.jpg" alt="${esc(c.name)}（ゲームの画面）" onerror="this.style.display='none'">
+      <div class="body"><div class="kicker">${esc(c.title || "")}・${esc(c.climate || "")}</div><h3>${esc(c.name)}</h3><p>${esc(c.text || "")}</p>
+      <dl class="facts"><dt>治める人</dt><dd>${esc(c.lord || "—")}</dd><dt>人口</dt><dd>約 ${c.population} 人（家 ${c.houses} 軒）${c.nocturnal ? "・夜に暮らす都" : ""}</dd>
+      <dt>場所</dt><dd>x ${c.x}・z ${c.z}</dd></dl><div class="chips">${fac}</div></div>`;
+  }
+  applyLayer(); show(W.cities[0]?.id);
+
+  // ---- 都市のカード ----
+  $("#citycards").innerHTML = W.cities.filter(c => !realms.has(c.id)).concat(W.cities.filter(c => realms.has(c.id))).map(c =>
+    `<button class="city reveal" type="button" data-id="${esc(c.id)}"><img src="images/shots/${esc(c.id)}.jpg" alt="${esc(c.name)}" loading="lazy" onerror="this.style.display='none'">
+     <div class="body"><h3>${esc(c.name)}</h3><p>${esc(c.text || "")}</p></div></button>`).join("");
+  document.querySelectorAll(".city").forEach(b => b.addEventListener("click", () => {
+    const id = b.dataset.id; layer = realms.has(id) ? "realm" : "ground"; applyLayer(); show(id);
+    $("#map").scrollIntoView({ behavior: "smooth" });
+  }));
+
+  // ---- 生き物図鑑 ----
+  const colors = { Friendly: "#6a9e4f", Producer: "#c28b2c", Aquatic: "#3d7fb8", Mount: "#8a5a3c", Tameable: "#b0473f", Arena: "#6e58b0", Spirit: "#3a9a96" };
+  const classes = [...new Set(W.mobs.map(m => m.cls))];
+  let cls = "all";
+  const mt = $("#mobtabs");
+  mt.innerHTML = `<button class="on" data-c="all" type="button">すべて</button>` + classes.map(c => `<button data-c="${esc(c)}" type="button">${esc(W.mobs.find(m => m.cls === c).clsName)}</button>`).join("");
+  const JA = { Plains: "平原", Forest: "森", Mountain: "山", Snow: "雪原", Village: "村", River: "川", Lake: "湖", Sea: "海", Desert: "砂漠",
+    wool: "羊毛", milk: "牛乳", egg: "たまご", honey: "はちみつ", cloud_wool: "雲の羊毛" };
+  const ja = s => JA[s] || s;
+  W.mobs.forEach(m => { m.habitats = (m.habitats || []).map(ja); if (m.produce) m.produce = ja(m.produce); });
+  const drawMobs = () => {
+    $("#moblist").innerHTML = W.mobs.filter(m => cls === "all" || m.cls === cls).map(m => `<div class="mob">
+      <div class="sigil" style="background:${colors[m.cls] || "#777"}">${esc(m.name[0])}</div>
+      <h4>${esc(m.name)}</h4><div class="cls">${esc(m.clsName)}　<span class="badge ${m.status === "ingame" ? "done" : "plan"}">${m.status === "ingame" ? "ゲームにいる" : "設計中"}</span></div>
+      <p>${esc(m.ability || m.move || (m.produce ? "産物: " + m.produce : (m.habitats || []).length ? "住む所: " + m.habitats.join("・") : ""))}</p></div>`).join("");
+    mt.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.c === cls));
+  };
+  mt.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { cls = b.dataset.c; drawMobs(); }));
+  drawMobs();
+
+  // ---- 仲間（data/heroes.json と同じデータ） ----
+  const H = W.heroes;
+  if (H) {
+    const rgb = c => c ? `rgb(${c[0]},${c[1]},${c[2]})` : "#888";
+    const god = e => H.gods.find(g => g.element === e) || { color: [150, 150, 150], elementName: e, name: e };
+    const TYPE = { sword: "剣士", magic: "魔法使い", rider: "騎乗盗賊", bow: "弓使い", shield: "盾使い", axe: "斧使い", alchemy: "錬金術師" };
+    const stars = n => "★".repeat(n);
+    // 色見本の小さな肖像（ゲームのデータの色で描いた図。ゲームの画面ではありません）
+    const portrait = l => {
+      const hair = rgb(l.hairColor), long = l.hair === "long", side = l.hair === "twin" || l.hair === "ponytail";
+      return `<div class="portrait" title="ゲームのデータの色で描いた色見本">
+        ${long ? `<b style="left:14px;top:18px;width:46px;height:52px;background:${hair};border-radius:6px"></b>` : ""}
+        <b style="left:17px;top:20px;width:40px;height:38px;background:${rgb(l.skin)};border-radius:6px"></b>
+        <b style="left:14px;top:12px;width:46px;height:16px;background:${hair};border-radius:8px 8px 4px 4px"></b>
+        ${side ? `<b style="left:6px;top:24px;width:10px;height:30px;background:${hair};border-radius:4px"></b><b style="left:58px;top:24px;width:10px;height:${l.hair === "twin" ? 30 : 0}px;background:${hair};border-radius:4px"></b>` : ""}
+        <b style="left:24px;top:34px;width:8px;height:10px;background:${rgb(l.eye)};border-radius:3px;box-shadow:inset 2px 2px 0 rgba(255,255,255,.7)"></b>
+        <b style="left:42px;top:34px;width:8px;height:10px;background:${rgb(l.eye)};border-radius:3px;box-shadow:inset 2px 2px 0 rgba(255,255,255,.7)"></b>
+        <b style="left:15px;top:60px;width:44px;height:30px;background:${rgb(l.cloth)};border-radius:8px 8px 4px 4px"></b>
+        <b style="left:15px;top:72px;width:44px;height:4px;background:${rgb(l.accent)}"></b></div>`;
+    };
+    const statIdx = [0, 2, 3, 4];
+    $("#herolist").innerHTML = H.heroes.map(h => {
+      const g = god(h.element);
+      const lv30 = h.base.map((b, i) => b + h.growth[i] * 29);
+      const maxs = [600, 60, 60, 60];
+      return `<div class="herocard reveal" style="--el:${rgb(g.color)}">${portrait(h.look)}<div>
+        <div class="stars">${stars(h.rarity)}${h.starter ? "　<span class='badge done'>はじめの仲間</span>" : ""}</div>
+        <h4>${esc(h.name)}</h4><div class="meta">${esc(h.title)}　${esc(TYPE[h.type] || h.type)}・${esc(g.elementName)}</div>
+        <p>${esc(h.profile)}</p>
+        <div class="bars">${statIdx.map((s, k) => `<span>${esc(H.stats[s])}</span><i style="width:${Math.min(100, lv30[s] / maxs[k] * 100).toFixed(0)}%"></i>`).join("")}</div>
+        <div class="meta" style="margin-top:4px">Lv30 のめやす</div></div></div>`;
+    }).join("");
+    $("#gachaprice").textContent = `1 回 ${H.gacha.single} コイン・10 回 ${H.gacha.ten} コイン（10 回は ★4 以上が 1 つ以上）。キャラクターは ${H.gacha.pity} 回までに必ず 1 人。`;
+    const KIND = { hero: "★4〜5 キャラクター", season: "★5 季節限定衣装", skin: "★5 特別なスキン", costume: "★3 衣装", weapon: "★4〜5 固有武器", orb: "★3〜5 オーブ", special: "★3 特別なアイテム", furniture: "★2 家具・飾り", material: "★1 素材" };
+    $("#gacharates").innerHTML = H.gacha.rates.map(r => `<div class="rate"><span>${esc(KIND[r.kind] || r.kind)}</span><div class="bar"><i style="width:${(r.rate / 40 * 100).toFixed(1)}%"></i></div><span>${r.rate.toFixed(1)}%</span></div>`).join("");
+    const SEASON = { spring: "春祭り", summer: "夏祭り", autumn: "秋祭り", winter: "冬祭り" };
+    const JSTAT = { hp: "HP", mp: "MP", patk: "物理攻撃", matk: "魔法攻撃", def: "防御", sword: "剣", axe: "斧", bow: "弓", alchemy: "錬金", dex: "器用", riding: "騎乗", mining: "採掘", farming: "農業", explore: "探索" };
+    const bonus = b => Object.entries(b || {}).map(([k, v]) => `${JSTAT[k] || k} +${v}`).join("・");
+    $("#costumelist").innerHTML = H.costumes.filter(c => c.kind !== "normal").map(c => `<div class="minicard" style="--el:${rgb(c.cloth)}"><b>${esc(c.name)}</b><span>${c.kind === "season" ? esc(SEASON[c.season] || "") + "の限定" : "スキン"}・${esc(bonus(c.bonus))}</span></div>`).join("");
+    $("#weaponlist").innerHTML = H.weapons.map(w => `<div class="minicard" style="--el:${rgb(god(w.element).color)}"><b>${esc(w.name)}</b><span>${stars(w.rarity)} ${esc(god(w.element).elementName)}・攻撃 ${w.attack}・${esc(w.effect)}</span></div>`).join("");
+    $("#orblist").innerHTML = H.orbs.map(o => `<div class="minicard" style="--el:${rgb(god(o.element).color)}"><b>${esc(o.name)}</b><span>${esc(bonus(o.bonus))}（Lv で伸びる）</span></div>`).join("");
+    $("#godlist").innerHTML = H.gods.map(g => {
+      const light = g.color[0] + g.color[1] + g.color[2] > 560;
+      return `<div class="god reveal${light ? " light" : ""}" style="--el:${rgb(g.color)}"><div class="lantern"></div><div class="el">${esc(g.elementName)}</div>
+        <h4>${esc(g.name)}</h4><p>${esc(g.lore)}</p><div class="n">祠 ${g.shrines} か所</div></div>`;
+    }).join("");
+  }
+
+
+
+  // ---- 写真館 ----
+  const shots = [
+    ["city_farm", "豊穣の都ミノリア"], ["interior_nordic", "森の砦の家: 暖炉と薪"], ["shrine", "街道の祠: 祈る人とベンチで休む人"], ["city_water", "水の都ヴェルナ"],
+    ["city_desert", "砂の王都ネフェルカ"], ["interior_japan", "城下町の家"], ["letter", "落とし物の手紙を読む"], ["city_gothic", "雪の聖都シュネーブルク"],
+    ["city_japan", "城下町アカネ"], ["interior_teahouse", "茶屋の中"], ["city_elf", "世界樹の都エルフェイム"], ["shrine_sand", "砂地の祠"],
+    ["city_mine", "鉱山都市グラナート"], ["street_gothic", "雪の聖都の通り"], ["city_nordic", "森の砦ノルドハイム"], ["interior_elf", "エルフの家"],
+    ["hero_party_faces", "同行する仲間（アニメ調のモデル）"], ["hero_party5", "5 人のパーティ"], ["toon_residents", "輪郭線とセル調の陰影になった町の人（エルフェイム）"], ["hero_gacha", "めぐり逢いの泉（ガチャ）の演出"], ["hero_dispatch", "石切り場で働く派遣の仲間"], ["shrine_lantern_ice", "霜晶神の祠の提灯（夜）"], ["element_ice_path", "氷の技で凍らせた道"], ["stadium_aerial", "シュネーブルクの大闘技場"], ["stadium_finale", "大会の決着: 紙吹雪と総立ちの観客"], ["stadium_partner", "自分の相棒で大会に出る"], ["tavern_night", "酒場: 座る客と歌う客"], ["spirit_companion", "夜の祠で契った精霊"], ["aquatic", "海のイルカ"], ["suburb_mine", "グラナートの石切り場"], ["suburb_japan", "アカネの田んぼ"], ["suburb_nordic", "ノルドハイムの伐採場"],
+    ["city_heaven", "天空の聖都アウレリア"], ["city_hell", "炎の民の都ヴォルカニア"], ["village_nether", "冥府の都ネクロポリス"], ["lan", "LAN で参加した友だち"]];
+  $("#gallerylist").innerHTML = shots.map(([f, c]) => `<figure data-src="images/shots/${f}.jpg" data-cap="${esc(c)}"><img src="images/shots/${f}.jpg" alt="${esc(c)}" loading="lazy"><figcaption>${esc(c)}</figcaption></figure>`).join("");
+  const lb = $("#lightbox");
+  document.querySelectorAll(".gallery figure").forEach(f => f.addEventListener("click", () => { $("#lbimg").src = f.dataset.src; $("#lbcap").textContent = f.dataset.cap; lb.classList.add("on"); }));
+  lb.addEventListener("click", () => lb.classList.remove("on"));
+  addEventListener("keydown", e => { if (e.key === "Escape") lb.classList.remove("on"); });
+
+  // ---- 少しずつ現れる ----
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" }) : null;
+  document.querySelectorAll(".reveal").forEach(el => io ? io.observe(el) : el.classList.add("in"));
+})();
+</script>
+</body>
+</html>
